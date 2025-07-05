@@ -1,0 +1,274 @@
+.app {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid #ddd;
+  background: #f8f8f8;
+  gap: 1rem;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-logo {
+  width: 48px;
+  height: 48px;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  color: #646cff;
+  margin: 0;
+}
+
+.run-button {
+  padding: 0.5rem 1.5rem;
+  background: #22c55e;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.run-button:disabled {
+  background: #888;
+  cursor: not-allowed;
+}
+
+.gist-error {
+  color: #d97706;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  background: #fef3c7;
+  border-radius: 4px;
+  border: 1px solid #f59e0b;
+}
+
+.github-link {
+  color: #646cff;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border: 1px solid #646cff;
+  border-radius: 4px;
+  transition: all 200ms;
+}
+
+.github-link:hover {
+  background: #646cff;
+  color: white;
+}
+
+.main-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: #ddd;
+}
+
+.code-panel {
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-editor {
+  flex: 1;
+  font-size: 14px;
+}
+
+.code-editor .cm-editor {
+  height: 100%;
+}
+
+.code-editor .cm-scroller {
+  font-family: 'Courier New', monospace;
+}
+
+.results-panel {
+  background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.output-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #ddd;
+}
+
+.output-section h3 {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  font-size: 1rem;
+  color: #333;
+}
+
+.output {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  white-space: pre-wrap;
+  margin: 0;
+  background: #fafafa;
+}
+
+.queries-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.query-viewer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.query-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+}
+
+.query-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.query-header button {
+  padding: 0.25rem 0.5rem;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.query-layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1px;
+  background: #ddd;
+}
+
+.query-list {
+  background: white;
+  overflow-y: auto;
+}
+
+.query-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 200ms;
+}
+
+.query-item:hover {
+  background: #f8f8f8;
+}
+
+.query-item.selected {
+  background: #e0f2fe;
+}
+
+.query-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.database-badge {
+  background: #646cff;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.query-type-badge {
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.query-type-badge.ddl {
+  background: #f59e0b;
+}
+
+.query-type-badge.dml {
+  background: #10b981;
+}
+
+.timestamp {
+  color: #666;
+  font-size: 0.8rem;
+}
+
+.query-preview {
+  color: #333;
+  font-size: 0.9rem;
+  font-family: 'Courier New', monospace;
+}
+
+.query-details {
+  background: white;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.query-sql,
+.query-params,
+.query-result,
+.query-error {
+  margin-bottom: 1rem;
+}
+
+.query-sql pre,
+.query-params pre,
+.query-result pre,
+.query-error pre {
+  background: #f8f8f8;
+  padding: 1rem;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+}
+
+.query-error pre {
+  background: #fee;
+  color: #c00;
+}
