@@ -1,8 +1,8 @@
 import { PGlite } from '@electric-sql/pglite';
-import initSqlJs, { type Database } from '@sqlite.org/sqlite-wasm';
+import initSqlJs, { type Sqlite3Static } from '@sqlite.org/sqlite-wasm';
 
 let pglite: PGlite | null = null;
-let sqlite: Database | null = null;
+let sqlite: Sqlite3Static | null = null;
 
 export async function initializePGlite(): Promise<PGlite> {
   if (pglite) return pglite;
@@ -11,7 +11,7 @@ export async function initializePGlite(): Promise<PGlite> {
   return pglite;
 }
 
-export async function initializeSQLite(): Promise<Database> {
+export async function initializeSQLite(): Promise<Sqlite3Static> {
   if (sqlite) return sqlite;
 
   sqlite = await initSqlJs({
@@ -26,6 +26,6 @@ export function getPGliteInstance(): PGlite | null {
   return pglite;
 }
 
-export function getSQLiteInstance(): Database | null {
+export function getSQLiteInstance(): Sqlite3Static | null {
   return sqlite;
 }

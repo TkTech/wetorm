@@ -160,7 +160,7 @@ except Exception as e:
     queryResult.queries.forEach((query: DjangoQuery, index: number) => {
       // Determine query type
       const sql = query.sql.trim().toUpperCase();
-      let queryType = 'DML'; // Data Manipulation Language (SELECT, INSERT, UPDATE, DELETE)
+      let queryType: 'DDL' | 'DML' = 'DML'; // Data Manipulation Language (SELECT, INSERT, UPDATE, DELETE)
       if (
         sql.startsWith('CREATE') ||
         sql.startsWith('ALTER') ||

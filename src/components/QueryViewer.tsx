@@ -89,12 +89,12 @@ export const QueryViewer: React.FC = () => {
                   <pre>{JSON.stringify(selectedQuery.parameters, null, 2)}</pre>
                 </div>
               )}
-              {selectedQuery.result && (
+              {selectedQuery.result ? (
                 <div className="query-result">
                   <h4>Result</h4>
                   <pre>{JSON.stringify(selectedQuery.result, null, 2)}</pre>
                 </div>
-              )}
+              ) : null}
               {selectedQuery.error && (
                 <div className="query-error">
                   <h4>Error</h4>
