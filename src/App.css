@@ -256,7 +256,16 @@
   margin-bottom: 1rem;
 }
 
-.query-sql pre,
+.sql-viewer {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sql-viewer .cm-editor {
+  font-size: 14px;
+}
+
 .query-params pre,
 .query-result pre,
 .query-error pre {

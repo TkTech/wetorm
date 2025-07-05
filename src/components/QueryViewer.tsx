@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import CodeMirror from '@uiw/react-codemirror';
+import { sql } from '@codemirror/lang-sql';
 import { queryCapture, type QueryInfo } from '../services/queryCapture';
 
 export const QueryViewer: React.FC = () => {
@@ -81,7 +83,21 @@ export const QueryViewer: React.FC = () => {
               </div>
               <div className="query-sql">
                 <h4>SQL Query</h4>
-                <pre>{selectedQuery.query}</pre>
+                <CodeMirror
+                  value={selectedQuery.query}
+                  extensions={[sql()]}
+                  editable={false}
+                  basicSetup={{
+                    lineNumbers: false,
+                    foldGutter: false,
+                    dropCursor: false,
+                    allowMultipleSelections: false,
+                    searchKeymap: false,
+                    autocompletion: false,
+                    highlightSelectionMatches: false,
+                  }}
+                  className="sql-viewer"
+                />
               </div>
               {selectedQuery.parameters && (
                 <div className="query-params">

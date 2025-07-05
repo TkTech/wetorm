@@ -70,7 +70,7 @@ function App() {
     <div className="app">
       <header className="header">
         <div className="header-title">
-          <img src="/logo_small.png" alt="WetORM Logo" className="header-logo" />
+          <img src="/wetorm/logo_small.png" alt="WetORM Logo" className="header-logo" />
           <h1>WetORM</h1>
         </div>
         {gistError && (
