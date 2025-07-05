@@ -18,6 +18,10 @@
 - **Code Sharing**: Share your Django examples via GitHub Gist URLs
 - **Zero Setup**: No installation required - everything runs in the browser
 - **Syntax Highlighting**: Python code editor with syntax highlighting and auto-completion
+- **100% client-side**: Your code never leaves your browser
+
+For a more feature-complete option, check out xterm's [DryORM][], which
+inspired this fun weekend project.
 
 ## Usage
 
@@ -51,3 +55,6 @@ npm run dev
 ## License
 
 MIT License - see LICENSE file for details.
+
+[DryORM]: https://github.com/omaraboumrad/dryorm
+
