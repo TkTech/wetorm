@@ -44,13 +44,20 @@ npm run dev
 - `npm run lint` - Run ESLint
 - `npm run format` - Format code with Prettier
 
-## Technology Stack
+## How Does It Work?
 
-- **Frontend**: React + TypeScript + Vite
-- **Code Editor**: CodeMirror with Python syntax highlighting
-- **Python Runtime**: Pyodide (Python in WebAssembly)
-- **Django**: Full Django ORM running in the browser
-- **Database**: SQLite in-memory via Django
+WetORM leverages several cutting-edge web technologies to run Django entirely in your browser:
+
+1. **Pyodide**: A Python distribution compiled to WebAssembly that includes Django and SQLite
+2. **In-Memory Database**: SQLite runs entirely in browser memory - no server required
+3. **Query Interception**: Django's query logging captures every SQL statement executed by the ORM
+4. **Real-Time Analysis**: As you write Django code, WetORM automatically:
+   - Detects model definitions
+   - Creates database tables (DDL queries)
+   - Executes your `run()` function
+   - Captures and categorizes all resulting SQL queries
+
+The entire process happens client-side with zero server interaction, making it perfect for learning, experimenting, and sharing Django ORM examples.
 
 ## License
 
