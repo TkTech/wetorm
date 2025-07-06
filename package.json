@@ -21,7 +21,8 @@
     "@uiw/react-codemirror": "^4.24.0",
     "pyodide": "^0.28.0",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "sql-formatter": "^15.6.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.29.0",

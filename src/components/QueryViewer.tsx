@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
 import { python } from '@codemirror/lang-python';
+import { format } from 'sql-formatter';
 import { queryCapture, type QueryInfo } from '../services/queryCapture';
 
 interface QueryViewerProps {
@@ -38,6 +39,26 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
   const selectQuery = (query: QueryInfo) => {
     setSelectedQuery(query);
     onLineHighlight?.(query.sourceLineNumber || null);
+  };
+
+  const formatSQL = (sql: string) => {
+    try {
+      return format(sql, {
+        language: 'sqlite',
+        tabWidth: 2,
+        useTabs: false,
+        keywordCase: 'upper',
+        identifierCase: 'lower',
+        functionCase: 'upper',
+        // We need to support %s-style parameters used by the Django ORM
+        paramTypes: {
+          custom: [{ regex: '%s' }],
+        },
+      });
+    } catch (error) {
+      console.error('Error formatting SQL:', error);
+      return sql;
+    }
   };
 
   return (
@@ -96,7 +117,7 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
               <div className="query-sql">
                 <h4>Query</h4>
                 <CodeMirror
-                  value={selectedQuery.query}
+                  value={formatSQL(selectedQuery.query)}
                   extensions={[sql()]}
                   editable={false}
                   basicSetup={{

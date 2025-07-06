@@ -143,9 +143,7 @@ count
   }
 }
 
-export async function executeQuery(
-  query: string
-): Promise<{
+export async function executeQuery(query: string): Promise<{
   columns: string[];
   rows: (string | number | null | boolean)[][];
   error?: string;
