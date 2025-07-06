@@ -60,6 +60,25 @@ export async function initializePyodide(): Promise<PyodideInterface> {
             SECRET_KEY='wetorm-development-key',
             DEBUG=True,
             USE_TZ=False,
+            USE_I18N=True,
+            USE_L10N=True,
+            TIME_ZONE='UTC',
+            TEMPLATES=[
+                {
+                    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                    'DIRS': [],
+                    'APP_DIRS': True,
+                    'OPTIONS': {
+                        'context_processors': [
+                            'django.template.context_processors.debug',
+                            'django.template.context_processors.request',
+                            'django.contrib.auth.context_processors.auth',
+                            'django.contrib.messages.context_processors.messages',
+                        ],
+                    },
+                },
+            ],
+            DEFAULT_AUTO_FIELD='django.db.models.BigAutoField',
             LOGGING={
                 'version': 1,
                 'disable_existing_loggers': False,
