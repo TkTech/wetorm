@@ -260,6 +260,15 @@ try:
         # Run the 'run' function if it exists
         if 'run' in namespace and callable(namespace['run']):
             namespace['run']()
+        
+        # Copy models and other important definitions to global namespace for REPL access
+        for name, obj in namespace.items():
+            if not name.startswith('__'):  # Skip special variables
+                # Copy models, functions, and other user-defined objects to globals
+                if (hasattr(obj, '__mro__') and 
+                    any(base.__name__ == 'Model' and base.__module__ == 'django.db.models.base' 
+                        for base in obj.__mro__[1:])) or callable(obj):
+                    globals()[name] = obj
     
     result = captured_output.getvalue()
 except Exception as e:

@@ -7,6 +7,7 @@ import { StateField, StateEffect } from '@codemirror/state';
 import { runDjangoCode } from './services/pyodide';
 import { QueryViewer } from './components/QueryViewer';
 import { DatabaseBrowser } from './components/DatabaseBrowser';
+import { PythonRepl } from './components/PythonRepl';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
 import './App.css';
 
@@ -76,6 +77,7 @@ function App() {
   const [gistError, setGistError] = useState<string | null>(null);
   const [editorView, setEditorView] = useState<EditorView | null>(null);
   const [dbRefreshTrigger, setDbRefreshTrigger] = useState<number>(0);
+  const [showRepl, setShowRepl] = useState(false);
 
   // Load gist content on mount if URL contains gist parameter
   useEffect(() => {
@@ -126,6 +128,7 @@ function App() {
       });
     }
   };
+
 
   return (
     <div className="app">
@@ -185,8 +188,20 @@ function App() {
 
         <div className="results-panel">
           <div className="output-section">
-            <h3>Output</h3>
-            <pre className="output">{output}</pre>
+            <div className="output-header">
+              <h3>{showRepl ? 'Python REPL' : 'Output'}</h3>
+              <button 
+                className="header-button toggle-button"
+                onClick={() => setShowRepl(!showRepl)}
+              >
+                {showRepl ? 'Show Output' : 'Show REPL'}
+              </button>
+            </div>
+            {showRepl ? (
+              <PythonRepl onCommandExecuted={() => setDbRefreshTrigger(prev => prev + 1)} />
+            ) : (
+              <pre className="output">{output}</pre>
+            )}
           </div>
           <QueryViewer onLineHighlight={handleLineHighlight} />
         </div>

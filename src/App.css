@@ -86,6 +86,15 @@ body, html, #root, .app {
   background: #d97706;
 }
 
+.header-button.toggle-button {
+  background: #8b5cf6;
+  color: white;
+}
+
+.header-button.toggle-button:hover {
+  background: #7c3aed;
+}
+
 .gist-error {
   color: #d97706;
   font-size: 0.875rem;
@@ -150,14 +159,21 @@ body, html, #root, .app {
   background: #fafafa;
 }
 
-.output-section h3 {
-  margin: 0;
-  padding: 0.75rem 1rem;
+.output-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
   background: #f8f8f8;
   border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.output-header h3 {
+  margin: 0;
+  padding: 0.25rem 0;
   font-size: 1rem;
   color: #333;
-  flex-shrink: 0;
 }
 
 .output {
@@ -506,4 +522,102 @@ body, html, #root, .app {
   color: #666;
   font-style: italic;
   font-size: 0.9rem;
+}
+
+.python-repl {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.repl-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.repl-header span {
+  font-weight: 500;
+  color: #333;
+}
+
+.repl-terminal-container {
+  flex: 1;
+  overflow: hidden;
+}
+
+.pyodide-terminal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #1e1e1e;
+  color: #d4d4d4;
+  font-family: 'Courier New', monospace;
+}
+
+.terminal-banner {
+  padding: 0.5rem 1rem;
+  background: #2d2d2d;
+  border-bottom: 1px solid #333;
+  color: #569cd6;
+  font-size: 0.9rem;
+}
+
+.terminal-content {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  line-height: 1.4;
+}
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #2d2d2d;
+  border-top: 1px solid #333;
+}
+
+.terminal-prompt {
+  color: #569cd6;
+  margin-right: 0.5rem;
+  font-weight: bold;
+}
+
+.terminal-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #d4d4d4;
+  font-family: inherit;
+  font-size: inherit;
+  outline: none;
+}
+
+.terminal-input-echo {
+  color: #d4d4d4;
+  margin-bottom: 0.25rem;
+}
+
+.terminal-output {
+  color: #d4d4d4;
+  margin-bottom: 0.5rem;
+  white-space: pre-wrap;
+}
+
+.terminal-error {
+  color: #f14c4c;
+  margin-bottom: 0.5rem;
+  white-space: pre-wrap;
+}
+
+.repl-error {
+  padding: 1rem;
+  color: #f14c4c;
+  text-align: center;
 }
