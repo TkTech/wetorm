@@ -13,10 +13,11 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
   const [tableCount, setTableCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  // Load tables on component mount and when refresh is triggered
+  // Only load tables when refresh is triggered (after code has been run)
   useEffect(() => {
-    loadTables();
+    if (refreshTrigger > 0) {
+      loadTables();
+    }
   }, [refreshTrigger]);
 
   // Refresh selected table data when refresh is triggered

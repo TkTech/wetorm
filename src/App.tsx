@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
-import { oneDark } from '@codemirror/theme-one-dark';
 import { indentUnit } from '@codemirror/language';
 import { Decoration, EditorView } from '@codemirror/view';
 import { StateField, StateEffect } from '@codemirror/state';
@@ -145,8 +144,7 @@ function App() {
             <CodeMirror
               value={code}
               onChange={(value) => setCode(value)}
-              extensions={[python(), oneDark, indentUnit.of("    "), highlightLineField]}
-              theme={oneDark}
+              extensions={[python(), indentUnit.of("    "), highlightLineField]}
               className="code-editor"
               basicSetup={{
                 lineNumbers: true,
