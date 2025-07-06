@@ -8,6 +8,8 @@ export interface QueryInfo {
   result?: unknown;
   error?: string;
   queryType?: 'DDL' | 'DML';
+  sourceLineNumber?: number;
+  sourceContext?: string;
 }
 
 class QueryCapture {

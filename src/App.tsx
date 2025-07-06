@@ -3,6 +3,8 @@ import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { indentUnit } from '@codemirror/language';
+import { Decoration, EditorView } from '@codemirror/view';
+import { StateField, StateEffect } from '@codemirror/state';
 import { runDjangoCode } from './services/pyodide';
 import { QueryViewer } from './components/QueryViewer';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
@@ -27,11 +29,42 @@ def run():
     print(f'Found {johns.count()} people with "John" in their name')
 `;
 
+// Create line highlighting extension
+const highlightLineEffect = StateEffect.define<number | null>();
+
+const highlightLineField = StateField.define({
+  create() {
+    return Decoration.none;
+  },
+  update(decorations, tr) {
+    decorations = decorations.map(tr.changes);
+    
+    for (const effect of tr.effects) {
+      if (effect.is(highlightLineEffect)) {
+        if (effect.value === null) {
+          decorations = Decoration.none;
+        } else {
+          const lineNumber = effect.value;
+          const line = tr.state.doc.line(lineNumber);
+          const decoration = Decoration.line({
+            attributes: { class: 'highlighted-line' }
+          });
+          decorations = Decoration.set([decoration.range(line.from)]);
+        }
+      }
+    }
+    
+    return decorations;
+  },
+  provide: f => EditorView.decorations.from(f)
+});
+
 function App() {
   const [code, setCode] = useState(DEFAULT_CODE);
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [gistError, setGistError] = useState<string | null>(null);
+  const [editorView, setEditorView] = useState<EditorView | null>(null);
 
   // Load gist content on mount if URL contains gist parameter
   useEffect(() => {
@@ -62,6 +95,14 @@ function App() {
       setOutput(`Error: ${error}`);
     } finally {
       setIsRunning(false);
+    }
+  };
+
+  const handleLineHighlight = (lineNumber: number | null) => {
+    if (editorView) {
+      editorView.dispatch({
+        effects: highlightLineEffect.of(lineNumber)
+      });
     }
   };
 
@@ -97,7 +138,7 @@ function App() {
           <CodeMirror
             value={code}
             onChange={(value) => setCode(value)}
-            extensions={[python(), oneDark, indentUnit.of("    ")]}
+            extensions={[python(), oneDark, indentUnit.of("    "), highlightLineField]}
             theme={oneDark}
             className="code-editor"
             basicSetup={{
@@ -111,6 +152,7 @@ function App() {
               autocompletion: true,
               highlightSelectionMatches: false,
             }}
+            onCreateEditor={(view) => setEditorView(view)}
           />
         </div>
 
@@ -119,7 +161,7 @@ function App() {
             <h3>Output</h3>
             <pre className="output">{output}</pre>
           </div>
-          <QueryViewer />
+          <QueryViewer onLineHighlight={handleLineHighlight} />
         </div>
       </main>
     </div>

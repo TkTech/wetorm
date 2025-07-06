@@ -214,9 +214,9 @@ body, html, #root, .app {
 
 .query-meta {
   display: flex;
-  justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  gap: 8px;
 }
 
 .database-badge {
@@ -242,9 +242,19 @@ body, html, #root, .app {
   background: #10b981;
 }
 
+.source-line-badge {
+  background: #8b5cf6;
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
 .timestamp {
   color: #666;
   font-size: 0.8rem;
+  text-align: right;
+  flex-grow: 1;
 }
 
 .query-preview {
@@ -291,4 +301,18 @@ body, html, #root, .app {
 .query-error pre {
   background: #fee;
   color: #c00;
+}
+
+.source-context {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.highlighted-line {
+  background: rgba(255, 255, 0, 0.2) !important;
+  border-left: 3px solid #8b5cf6;
 }

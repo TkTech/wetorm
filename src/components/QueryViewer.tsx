@@ -3,7 +3,11 @@ import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
 import { queryCapture, type QueryInfo } from '../services/queryCapture';
 
-export const QueryViewer: React.FC = () => {
+interface QueryViewerProps {
+  onLineHighlight?: (lineNumber: number | null) => void;
+}
+
+export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => {
   const [queries, setQueries] = useState<QueryInfo[]>([]);
   const [selectedQuery, setSelectedQuery] = useState<QueryInfo | null>(null);
 
@@ -25,6 +29,12 @@ export const QueryViewer: React.FC = () => {
     queryCapture.clearQueries();
     setQueries([]);
     setSelectedQuery(null);
+    onLineHighlight?.(null);
+  };
+
+  const selectQuery = (query: QueryInfo) => {
+    setSelectedQuery(query);
+    onLineHighlight?.(query.sourceLineNumber || null);
   };
 
   return (
@@ -40,7 +50,7 @@ export const QueryViewer: React.FC = () => {
             <div
               key={query.id}
               className={`query-item ${selectedQuery?.id === query.id ? 'selected' : ''}`}
-              onClick={() => setSelectedQuery(query)}
+              onClick={() => selectQuery(query)}
             >
               <div className="query-meta">
                 <span className="database-badge">{query.database}</span>
@@ -49,6 +59,11 @@ export const QueryViewer: React.FC = () => {
                     className={`query-type-badge ${query.queryType.toLowerCase()}`}
                   >
                     {query.queryType}
+                  </span>
+                )}
+                {query.sourceLineNumber && (
+                  <span className="source-line-badge">
+                    Line {query.sourceLineNumber}
                   </span>
                 )}
                 <span className="timestamp">
@@ -78,6 +93,17 @@ export const QueryViewer: React.FC = () => {
                   <p>
                     <strong>Execution Time:</strong>{' '}
                     {selectedQuery.executionTime}ms
+                  </p>
+                )}
+                {selectedQuery.sourceLineNumber && (
+                  <p>
+                    <strong>Source Line:</strong> {selectedQuery.sourceLineNumber}
+                  </p>
+                )}
+                {selectedQuery.sourceContext && (
+                  <p>
+                    <strong>Source Context:</strong>{' '}
+                    <code className="source-context">{selectedQuery.sourceContext}</code>
                   </p>
                 )}
               </div>
