@@ -12,16 +12,6 @@ body, html, #root, .app {
   height: 100%;
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  border-bottom: 1px solid #ddd;
-  background: #f8f8f8;
-  gap: 1rem;
-}
-
 .header-actions {
   display: flex;
   align-items: center;
@@ -35,30 +25,65 @@ body, html, #root, .app {
 }
 
 .header-logo {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
 }
 
-.header h1 {
-  font-size: 1.5rem;
+.header-title h1 {
+  font-size: 1.2rem;
   color: #646cff;
   margin: 0;
 }
 
-.run-button {
-  padding: 0.5rem 1.5rem;
-  background: #22c55e;
-  color: white;
+.header-button {
+  padding: 0.25rem 0.75rem;
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.875rem;
   font-weight: 500;
+  text-decoration: none;
+  transition: all 200ms;
+  display: inline-block;
 }
 
-.run-button:disabled {
+.header-button.run-button {
+  background: #22c55e;
+  color: white;
+}
+
+.header-button.run-button:disabled {
   background: #888;
   cursor: not-allowed;
+}
+
+.header-button.github-button {
+  background: transparent;
+  color: #646cff;
+  border: 1px solid #646cff;
+}
+
+.header-button.github-button:hover {
+  background: #646cff;
+  color: white;
+}
+
+.header-button.clear-button {
+  background: #ef4444;
+  color: white;
+}
+
+.header-button.clear-button:hover {
+  background: #dc2626;
+}
+
+.header-button.reset-button {
+  background: #f59e0b;
+  color: white;
+}
+
+.header-button.reset-button:hover {
+  background: #d97706;
 }
 
 .gist-error {
@@ -70,32 +95,30 @@ body, html, #root, .app {
   border: 1px solid #f59e0b;
 }
 
-.github-link {
-  color: #646cff;
-  text-decoration: none;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border: 1px solid #646cff;
-  border-radius: 4px;
-  transition: all 200ms;
-}
-
-.github-link:hover {
-  background: #646cff;
-  color: white;
-}
-
 .main-layout {
   flex: 1;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1px;
   background: #ddd;
-  height: 100%;
+  height: 100vh;
 }
 
 .code-panel {
   background: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.code-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-bottom: 1px solid #ddd;
+}
+
+.database-section {
+  flex: 1;
   display: flex;
   flex-direction: column;
 }
@@ -129,7 +152,7 @@ body, html, #root, .app {
 
 .output-section h3 {
   margin: 0;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1rem;
   background: #f8f8f8;
   border-bottom: 1px solid #ddd;
   font-size: 1rem;
@@ -159,29 +182,33 @@ body, html, #root, .app {
   flex-direction: column;
 }
 
-.query-header {
+.query-header,
+.db-header,
+.code-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.5rem 1rem;
   background: #f8f8f8;
   border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
 }
 
-.query-header h2 {
+.query-header h3,
+.db-header h3,
+.code-header h3 {
   margin: 0;
+  padding: 0.25rem 0;
   font-size: 1rem;
   color: #333;
 }
 
-.query-header button {
-  padding: 0.25rem 0.5rem;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.875rem;
+
+.code-header-actions,
+.db-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 
 .query-layout {
@@ -315,4 +342,172 @@ body, html, #root, .app {
 .highlighted-line {
   background: rgba(255, 255, 0, 0.2) !important;
   border-left: 3px solid #8b5cf6;
+}
+
+.database-browser {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+
+.db-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1px;
+  background: #ddd;
+}
+
+.tables-list {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.tables-list h4 {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.table-items {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.table-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 200ms;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+}
+
+.table-item:hover {
+  background: #f8f8f8;
+}
+
+.table-item.selected {
+  background: #e0f2fe;
+}
+
+.table-details {
+  background: white;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-table-selected {
+  padding: 2rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.schema-section,
+.data-section {
+  padding: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.schema-section h4,
+.data-section h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.schema-table,
+.data-table {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.schema-header,
+.data-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+.schema-header span,
+.data-header span {
+  padding: 0.5rem;
+  border-right: 1px solid #ddd;
+}
+
+.schema-header span:last-child,
+.data-header span:last-child {
+  border-right: none;
+}
+
+.schema-row,
+.data-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  font-size: 0.8rem;
+  font-family: 'Courier New', monospace;
+}
+
+.schema-row span,
+.data-row span {
+  padding: 0.5rem;
+  border-right: 1px solid #eee;
+  border-bottom: 1px solid #eee;
+}
+
+.schema-row span:last-child,
+.data-row span:last-child {
+  border-right: none;
+}
+
+.data-header {
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.data-row {
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+}
+
+.empty-data {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+.loading {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+.error-message {
+  color: #d97706;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  background: #fef3c7;
+  border-radius: 4px;
+  border: 1px solid #f59e0b;
+  margin-left: 1rem;
+}
+
+.empty-tables {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+  font-size: 0.9rem;
 }

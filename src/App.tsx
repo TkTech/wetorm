@@ -7,6 +7,7 @@ import { Decoration, EditorView } from '@codemirror/view';
 import { StateField, StateEffect } from '@codemirror/state';
 import { runDjangoCode } from './services/pyodide';
 import { QueryViewer } from './components/QueryViewer';
+import { DatabaseBrowser } from './components/DatabaseBrowser';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
 import './App.css';
 
@@ -65,6 +66,7 @@ function App() {
   const [isRunning, setIsRunning] = useState(false);
   const [gistError, setGistError] = useState<string | null>(null);
   const [editorView, setEditorView] = useState<EditorView | null>(null);
+  const [dbRefreshTrigger, setDbRefreshTrigger] = useState<number>(0);
 
   // Load gist content on mount if URL contains gist parameter
   useEffect(() => {
@@ -91,6 +93,8 @@ function App() {
     try {
       const result = await runDjangoCode(code);
       setOutput(result || '(code executed successfully, but there was no output)');
+      // Trigger database refresh after successful code execution
+      setDbRefreshTrigger(prev => prev + 1);
     } catch (error) {
       setOutput(`Error: ${error}`);
     } finally {
@@ -108,52 +112,59 @@ function App() {
 
   return (
     <div className="app">
-      <header className="header">
-        <div className="header-title">
-          <img src="/wetorm/logo_small.png" alt="WetORM Logo" className="header-logo" />
-          <h1>WetORM</h1>
-        </div>
-        {gistError && (
-          <div className="gist-error">
-            ⚠️ {gistError}
-          </div>
-        )}
-        <div className="header-actions">
-          <a 
-            href="https://github.com/tktech/wetorm" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="button github-link"
-          >
-            GitHub
-          </a>
-          <button className="button run-button" onClick={runCode} disabled={isRunning}>
-            {isRunning ? 'Running...' : 'Run'}
-          </button>
-        </div>
-      </header>
 
       <main className="main-layout">
         <div className="code-panel">
-          <CodeMirror
-            value={code}
-            onChange={(value) => setCode(value)}
-            extensions={[python(), oneDark, indentUnit.of("    "), highlightLineField]}
-            theme={oneDark}
-            className="code-editor"
-            basicSetup={{
-              lineNumbers: true,
-              foldGutter: true,
-              dropCursor: false,
-              allowMultipleSelections: false,
-              indentOnInput: true,
-              bracketMatching: true,
-              closeBrackets: true,
-              autocompletion: true,
-              highlightSelectionMatches: false,
-            }}
-            onCreateEditor={(view) => setEditorView(view)}
-          />
+          <div className="code-section">
+            <div className="code-header">
+              <div className="header-title">
+                <img src="/wetorm/logo_small.png" alt="WetORM Logo" className="header-logo" />
+                <h3>WetORM</h3>
+              </div>
+              <div className="code-header-actions">
+                {gistError && (
+                  <div className="gist-error">
+                    ⚠️ {gistError}
+                  </div>
+                )}
+                <div className="header-actions">
+                  <a 
+                    href="https://github.com/tktech/wetorm" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="header-button github-button"
+                  >
+                    GitHub
+                  </a>
+                  <button className="header-button run-button" onClick={runCode} disabled={isRunning}>
+                    {isRunning ? 'Running...' : 'Run'}
+                  </button>
+                </div>
+              </div>
+            </div>
+            <CodeMirror
+              value={code}
+              onChange={(value) => setCode(value)}
+              extensions={[python(), oneDark, indentUnit.of("    "), highlightLineField]}
+              theme={oneDark}
+              className="code-editor"
+              basicSetup={{
+                lineNumbers: true,
+                foldGutter: true,
+                dropCursor: false,
+                allowMultipleSelections: false,
+                indentOnInput: true,
+                bracketMatching: true,
+                closeBrackets: true,
+                autocompletion: true,
+                highlightSelectionMatches: false,
+              }}
+              onCreateEditor={(view) => setEditorView(view)}
+            />
+          </div>
+          <div className="database-section">
+            <DatabaseBrowser refreshTrigger={dbRefreshTrigger} />
+          </div>
         </div>
 
         <div className="results-panel">

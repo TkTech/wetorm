@@ -40,8 +40,8 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => 
   return (
     <div className="query-viewer">
       <div className="query-header">
-        <h2>Captured Queries</h2>
-        <button onClick={clearQueries}>Clear All</button>
+        <h3>Captured Queries</h3>
+        <button className="header-button clear-button" onClick={clearQueries}>Clear All</button>
       </div>
 
       <div className="query-layout">
