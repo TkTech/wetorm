@@ -20,16 +20,12 @@ export async function initializePyodide(): Promise<PyodideInterface> {
     indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.28.0/full/',
   });
 
-  // Install available packages that Django depends on
   await pyodide.loadPackage(['micropip', 'sqlite3']);
-
-  // Use micropip to install Django
   await pyodide.runPythonAsync(`
     import micropip
     await micropip.install('django')
   `);
 
-  // Configure Django to work in sync mode and set up base configuration
   pyodide.runPython(`
     import os
     import sys

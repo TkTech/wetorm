@@ -83,11 +83,11 @@ function App() {
             href="https://github.com/tktech/wetorm" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="github-link"
+            className="button github-link"
           >
             GitHub
           </a>
-          <button className="run-button" onClick={runCode} disabled={isRunning}>
+          <button className="button run-button" onClick={runCode} disabled={isRunning}>
             {isRunning ? 'Running...' : 'Run'}
           </button>
         </div>
@@ -120,10 +120,7 @@ function App() {
             <h3>Output</h3>
             <pre className="output">{output}</pre>
           </div>
-
-          <div className="queries-section">
-            <QueryViewer />
-          </div>
+          <QueryViewer />
         </div>
       </main>
     </div>
