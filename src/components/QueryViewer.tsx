@@ -13,10 +13,10 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => 
   const [selectedQuery, setSelectedQuery] = useState<QueryInfo | null>(null);
 
   useEffect(() => {
-    setQueries(queryCapture.getQueries());
+    setQueries(queryCapture.getQueries().reverse());
 
     const handleNewQuery = (query: QueryInfo) => {
-      setQueries((prev) => [...prev, query]);
+      setQueries((prev) => [query, ...prev]);
     };
 
     queryCapture.onQuery(handleNewQuery);
