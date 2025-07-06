@@ -1,4 +1,7 @@
-body, html, #root, .app {
+body,
+html,
+#root,
+.app {
   height: 100vh;
   margin: 0;
 }
@@ -219,7 +222,6 @@ body, html, #root, .app {
   color: #333;
 }
 
-
 .code-header-actions,
 .db-header-actions {
   display: flex;
@@ -362,7 +364,6 @@ body, html, #root, .app {
   flex-direction: column;
   height: 100%;
 }
-
 
 .db-content {
   flex: 1;

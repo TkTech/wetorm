@@ -25,21 +25,21 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
 
       try {
         const pyodide = await initializePyodide();
-        
+
         // Let's try a simpler approach - just use runPython directly for now
         let outputBuffer = '';
-        
+
         // Set up output capture
         pyodide.setStdout({
           batched: (msg) => {
             outputBuffer += msg;
-          }
+          },
         });
-        
+
         pyodide.setStderr({
           batched: (msg) => {
             outputBuffer += msg;
-          }
+          },
         });
 
         // Simple command execution function that uses the same namespace as main code
@@ -47,17 +47,19 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
           outputBuffer = ''; // Clear buffer
           try {
             // Execute in the same global namespace where models are defined
-            const result = pyodide.runPython(code, { globals: pyodide.globals });
+            const result = pyodide.runPython(code, {
+              globals: pyodide.globals,
+            });
             return {
               success: true,
               output: outputBuffer,
-              result: result
+              result: result,
             };
           } catch (error) {
             return {
               success: false,
               output: outputBuffer,
-              error: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error),
             };
           }
         };
@@ -74,9 +76,13 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
           </div>
         `;
 
-        const content = terminal.querySelector('#terminal-content') as HTMLElement;
-        const input = terminal.querySelector('#terminal-input') as HTMLInputElement;
-        
+        const content = terminal.querySelector(
+          '#terminal-content'
+        ) as HTMLElement;
+        const input = terminal.querySelector(
+          '#terminal-input'
+        ) as HTMLInputElement;
+
         if (!content || !input) {
           throw new Error('Failed to find terminal elements');
         }
@@ -92,7 +98,7 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
         const executeCommand = (command: string) => {
           // Display the command
           appendToTerminal(`>>> ${command}`, 'terminal-input-echo');
-          
+
           // For now, just execute single commands (no multiline support)
           try {
             const result = window.executeInPyodide?.(command);
@@ -100,7 +106,7 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
               appendToTerminal('Error: REPL not initialized', 'terminal-error');
               return;
             }
-            
+
             if (result.success) {
               // Show output if any
               if (result.output) {
@@ -115,9 +121,12 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
               if (result.output) {
                 appendToTerminal(result.output, 'terminal-output');
               }
-              appendToTerminal(result.error || 'Unknown error', 'terminal-error');
+              appendToTerminal(
+                result.error || 'Unknown error',
+                'terminal-error'
+              );
             }
-            
+
             // Trigger database refresh after any command execution
             onCommandExecuted?.();
           } catch (error) {
@@ -132,13 +141,12 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
             e.preventDefault();
             const command = input.value.trim();
             input.value = '';
-            
+
             if (command) {
               executeCommand(command);
             }
           }
         });
-
       } catch (error) {
         console.error('Failed to initialize Pyodide REPL:', error);
         if (terminalRef.current) {

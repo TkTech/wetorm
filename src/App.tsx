@@ -39,7 +39,7 @@ const highlightLineField = StateField.define({
   },
   update(decorations, tr) {
     decorations = decorations.map(tr.changes);
-    
+
     for (const effect of tr.effects) {
       if (effect.is(highlightLineEffect)) {
         if (effect.value === null) {
@@ -48,16 +48,16 @@ const highlightLineField = StateField.define({
           const lineNumber = effect.value;
           const line = tr.state.doc.line(lineNumber);
           const decoration = Decoration.line({
-            attributes: { class: 'highlighted-line' }
+            attributes: { class: 'highlighted-line' },
           });
           decorations = Decoration.set([decoration.range(line.from)]);
         }
       }
     }
-    
+
     return decorations;
   },
-  provide: f => EditorView.decorations.from(f)
+  provide: (f) => EditorView.decorations.from(f),
 });
 
 const STORAGE_KEY = 'wetorm-editor-content';
@@ -89,7 +89,9 @@ function App() {
           const gistContent = await fetchGistContent(gistId);
           setCode(gistContent);
         } catch (error) {
-          setGistError(error instanceof Error ? error.message : 'Failed to load gist');
+          setGistError(
+            error instanceof Error ? error.message : 'Failed to load gist'
+          );
         }
       }
     };
@@ -111,9 +113,11 @@ function App() {
 
     try {
       const result = await runDjangoCode(code);
-      setOutput(result || '(code executed successfully, but there was no output)');
+      setOutput(
+        result || '(code executed successfully, but there was no output)'
+      );
       // Trigger database refresh after successful code execution
-      setDbRefreshTrigger(prev => prev + 1);
+      setDbRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       setOutput(`Error: ${error}`);
     } finally {
@@ -124,39 +128,41 @@ function App() {
   const handleLineHighlight = (lineNumber: number | null) => {
     if (editorView) {
       editorView.dispatch({
-        effects: highlightLineEffect.of(lineNumber)
+        effects: highlightLineEffect.of(lineNumber),
       });
     }
   };
 
-
   return (
     <div className="app">
-
       <main className="main-layout">
         <div className="code-panel">
           <div className="code-section">
             <div className="code-header">
               <div className="header-title">
-                <img src="/wetorm/logo_small.png" alt="WetORM Logo" className="header-logo" />
+                <img
+                  src="/wetorm/logo_small.png"
+                  alt="WetORM Logo"
+                  className="header-logo"
+                />
                 <h3>WetORM</h3>
               </div>
               <div className="code-header-actions">
-                {gistError && (
-                  <div className="gist-error">
-                    ⚠️ {gistError}
-                  </div>
-                )}
+                {gistError && <div className="gist-error">⚠️ {gistError}</div>}
                 <div className="header-actions">
-                  <a 
-                    href="https://github.com/tktech/wetorm" 
-                    target="_blank" 
+                  <a
+                    href="https://github.com/tktech/wetorm"
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="header-button github-button"
                   >
                     GitHub
                   </a>
-                  <button className="header-button run-button" onClick={runCode} disabled={isRunning}>
+                  <button
+                    className="header-button run-button"
+                    onClick={runCode}
+                    disabled={isRunning}
+                  >
                     {isRunning ? 'Running...' : 'Run'}
                   </button>
                 </div>
@@ -165,7 +171,7 @@ function App() {
             <CodeMirror
               value={code}
               onChange={(value) => setCode(value)}
-              extensions={[python(), indentUnit.of("    "), highlightLineField]}
+              extensions={[python(), indentUnit.of('    '), highlightLineField]}
               className="code-editor"
               basicSetup={{
                 lineNumbers: true,
@@ -190,7 +196,7 @@ function App() {
           <div className="output-section">
             <div className="output-header">
               <h3>{showRepl ? 'Python REPL' : 'Output'}</h3>
-              <button 
+              <button
                 className="header-button toggle-button"
                 onClick={() => setShowRepl(!showRepl)}
               >
@@ -198,7 +204,11 @@ function App() {
               </button>
             </div>
             {showRepl ? (
-              <PythonRepl onCommandExecuted={() => setDbRefreshTrigger(prev => prev + 1)} />
+              <PythonRepl
+                onCommandExecuted={() =>
+                  setDbRefreshTrigger((prev) => prev + 1)
+                }
+              />
             ) : (
               <pre className="output">{output}</pre>
             )}

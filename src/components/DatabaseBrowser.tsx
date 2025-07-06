@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
-import { getTables, getTableSchema, getTableData, getTableCount, resetDatabase, type Column, type TableRow } from '../services/databaseOperations';
+import {
+  getTables,
+  getTableSchema,
+  getTableData,
+  getTableCount,
+  resetDatabase,
+  type Column,
+  type TableRow,
+} from '../services/databaseOperations';
 
 interface DatabaseBrowserProps {
   refreshTrigger?: number;
@@ -43,15 +51,15 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
     setSelectedTable(tableName);
     setLoading(true);
     setError(null);
-    
+
     try {
       // Load schema and data in parallel
       const [schema, data, count] = await Promise.all([
         getTableSchema(tableName),
         getTableData(tableName, 100),
-        getTableCount(tableName)
+        getTableCount(tableName),
       ]);
-      
+
       setTableSchema(schema);
       setTableData(data);
       setTableCount(count);
@@ -64,19 +72,23 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
   };
 
   const handleResetDatabase = async () => {
-    if (confirm('Are you sure you want to reset the database? This will delete all tables and data.')) {
+    if (
+      confirm(
+        'Are you sure you want to reset the database? This will delete all tables and data.'
+      )
+    ) {
       try {
         setError(null);
         setLoading(true);
         await resetDatabase();
-        
+
         // Clear local state
         setTables([]);
         setSelectedTable(null);
         setTableSchema([]);
         setTableData([]);
         setTableCount(0);
-        
+
         // Reload tables (should be empty now)
         await loadTables();
       } catch (err) {
@@ -94,17 +106,20 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
         <h3>Database Browser</h3>
         <div className="db-header-actions">
           {error && <div className="error-message">{error}</div>}
-          <button className="header-button reset-button" onClick={handleResetDatabase}>
+          <button
+            className="header-button reset-button"
+            onClick={handleResetDatabase}
+          >
             Reset DB
           </button>
         </div>
       </div>
-      
+
       <div className="db-content">
         <div className="tables-list">
           <h4>Tables ({tables.length})</h4>
           <div className="table-items">
-            {tables.map(tableName => (
+            {tables.map((tableName) => (
               <div
                 key={tableName}
                 className={`table-item ${selectedTable === tableName ? 'selected' : ''}`}
@@ -114,7 +129,9 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
               </div>
             ))}
             {tables.length === 0 && (
-              <div className="empty-tables">No tables found. Run some Django code to create tables.</div>
+              <div className="empty-tables">
+                No tables found. Run some Django code to create tables.
+              </div>
             )}
           </div>
         </div>
@@ -131,7 +148,7 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
                     <span>Nullable</span>
                     <span>Primary Key</span>
                   </div>
-                  {tableSchema.map(column => (
+                  {tableSchema.map((column) => (
                     <div key={column.name} className="schema-row">
                       <span>{column.name}</span>
                       <span>{column.type}</span>
@@ -143,7 +160,9 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
               </div>
 
               <div className="data-section">
-                <h4>Data ({tableCount} total rows, showing {tableData.length})</h4>
+                <h4>
+                  Data ({tableCount} total rows, showing {tableData.length})
+                </h4>
                 {loading ? (
                   <div className="loading">Loading...</div>
                 ) : (
@@ -151,14 +170,16 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
                     {tableData.length > 0 ? (
                       <>
                         <div className="data-header">
-                          {Object.keys(tableData[0]).map(key => (
+                          {Object.keys(tableData[0]).map((key) => (
                             <span key={key}>{key}</span>
                           ))}
                         </div>
                         {tableData.map((row, index) => (
                           <div key={index} className="data-row">
                             {Object.values(row).map((value, cellIndex) => (
-                              <span key={cellIndex}>{value === null ? 'NULL' : String(value)}</span>
+                              <span key={cellIndex}>
+                                {value === null ? 'NULL' : String(value)}
+                              </span>
                             ))}
                           </div>
                         ))}

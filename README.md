@@ -3,7 +3,7 @@
 <div align="center">
   <img src="misc/logo_medium.png" alt="WetORM Logo" width="128" height="128">
   
-  **Django ORM Query Analyzer in the Browser**
+  **Django ORM Query Explorer - in the Browser**
   
   Run Django ORM code and visualize the generated SQL queries in real-time.
 </div>
@@ -12,7 +12,7 @@
 
 ## Live
 
-You can try out WetORM for yourself at [https://tkte.ch/wetorm](https://tkte.ch/wetorm).
+You can try out WetORM for yourself at https://tkte.ch/wetorm/.
 
 ## Features
 
@@ -22,6 +22,8 @@ You can try out WetORM for yourself at [https://tkte.ch/wetorm](https://tkte.ch/
 - **Zero Setup**: No installation required - everything runs in the browser
 - **Syntax Highlighting**: Python code editor with syntax highlighting and auto-completion
 - **100% client-side**: Your code never leaves your browser
+- **Basic Database Browser**: View and interact with database tables and data as you run queries
+- **REPL**: Interactive Python shell for experimenting with your Django models
 
 For a more feature-complete option, check out xterm's [DryORM][], which
 inspired this fun weekend project.
@@ -45,4 +47,3 @@ npm run dev
 MIT License - see LICENSE file for details.
 
 [DryORM]: https://github.com/omaraboumrad/dryorm
-

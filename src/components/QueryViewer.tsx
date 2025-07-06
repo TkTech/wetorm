@@ -8,7 +8,9 @@ interface QueryViewerProps {
   onLineHighlight?: (lineNumber: number | null) => void;
 }
 
-export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => {
+export const QueryViewer: React.FC<QueryViewerProps> = ({
+  onLineHighlight,
+}) => {
   const [queries, setQueries] = useState<QueryInfo[]>([]);
   const [selectedQuery, setSelectedQuery] = useState<QueryInfo | null>(null);
 
@@ -42,7 +44,9 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => 
     <div className="query-viewer">
       <div className="query-header">
         <h3>Captured Queries</h3>
-        <button className="header-button clear-button" onClick={clearQueries}>Clear All</button>
+        <button className="header-button clear-button" onClick={clearQueries}>
+          Clear All
+        </button>
       </div>
 
       <div className="query-layout">

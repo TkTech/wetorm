@@ -19,7 +19,7 @@ export interface TableRow {
 
 export async function getTables(): Promise<string[]> {
   const pyodide = await initializePyodide();
-  
+
   try {
     const result = pyodide.runPython(`
 import sqlite3
@@ -33,7 +33,7 @@ cursor.close()
 
 tables
     `);
-    
+
     return result.toJs();
   } catch (error) {
     console.error('Error getting tables:', error);
@@ -43,10 +43,10 @@ tables
 
 export async function getTableSchema(tableName: string): Promise<Column[]> {
   const pyodide = await initializePyodide();
-  
+
   try {
     pyodide.globals.set('table_name', tableName);
-    
+
     const result = pyodide.runPython(`
 from django.db import connection
 
@@ -69,7 +69,7 @@ for col_info in columns_info:
 
 columns
     `);
-    
+
     return result.toJs();
   } catch (error) {
     console.error('Error getting table schema:', error);
@@ -77,13 +77,16 @@ columns
   }
 }
 
-export async function getTableData(tableName: string, limit: number = 100): Promise<TableRow[]> {
+export async function getTableData(
+  tableName: string,
+  limit: number = 100
+): Promise<TableRow[]> {
   const pyodide = await initializePyodide();
-  
+
   try {
     pyodide.globals.set('table_name', tableName);
     pyodide.globals.set('limit', limit);
-    
+
     const result = pyodide.runPython(`
 from django.db import connection
 
@@ -108,7 +111,7 @@ for row in rows:
 
 data
     `);
-    
+
     return result.toJs();
   } catch (error) {
     console.error('Error getting table data:', error);
@@ -118,10 +121,10 @@ data
 
 export async function getTableCount(tableName: string): Promise<number> {
   const pyodide = await initializePyodide();
-  
+
   try {
     pyodide.globals.set('table_name', tableName);
-    
+
     const result = pyodide.runPython(`
 from django.db import connection
 
@@ -132,7 +135,7 @@ cursor.close()
 
 count
     `);
-    
+
     return result;
   } catch (error) {
     console.error('Error getting table count:', error);
@@ -140,12 +143,18 @@ count
   }
 }
 
-export async function executeQuery(query: string): Promise<{ columns: string[]; rows: (string | number | null | boolean)[][]; error?: string }> {
+export async function executeQuery(
+  query: string
+): Promise<{
+  columns: string[];
+  rows: (string | number | null | boolean)[][];
+  error?: string;
+}> {
   const pyodide = await initializePyodide();
-  
+
   try {
     pyodide.globals.set('query', query);
-    
+
     const result = pyodide.runPython(`
 from django.db import connection
 
@@ -177,20 +186,20 @@ except Exception as e:
         'error': str(e)
     }
     `);
-    
+
     return result.toJs();
   } catch (error) {
     return {
       columns: [],
       rows: [],
-      error: String(error)
+      error: String(error),
     };
   }
 }
 
 export async function resetDatabase(): Promise<void> {
   const pyodide = await initializePyodide();
-  
+
   try {
     pyodide.runPython(`
 from django.db import connection
