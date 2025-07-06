@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
+import { python } from '@codemirror/lang-python';
 import { queryCapture, type QueryInfo } from '../services/queryCapture';
 
 interface QueryViewerProps {
@@ -80,35 +81,16 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => 
         <div className="query-details">
           {selectedQuery && (
             <div>
-              <h3>Query Details</h3>
               <div className="query-info">
-                <p>
-                  <strong>Database:</strong> {selectedQuery.database}
-                </p>
-                <p>
-                  <strong>Timestamp:</strong>{' '}
-                  {new Date(selectedQuery.timestamp).toLocaleString()}
-                </p>
-                {selectedQuery.executionTime && (
+                {selectedQuery.executionTime ? (
                   <p>
                     <strong>Execution Time:</strong>{' '}
                     {selectedQuery.executionTime}ms
                   </p>
-                )}
-                {selectedQuery.sourceLineNumber && (
-                  <p>
-                    <strong>Source Line:</strong> {selectedQuery.sourceLineNumber}
-                  </p>
-                )}
-                {selectedQuery.sourceContext && (
-                  <p>
-                    <strong>Source Context:</strong>{' '}
-                    <code className="source-context">{selectedQuery.sourceContext}</code>
-                  </p>
-                )}
+                ) : null}
               </div>
               <div className="query-sql">
-                <h4>SQL Query</h4>
+                <h4>Query</h4>
                 <CodeMirror
                   value={selectedQuery.query}
                   extensions={[sql()]}
@@ -129,6 +111,26 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({ onLineHighlight }) => 
                 <div className="query-params">
                   <h4>Parameters</h4>
                   <pre>{JSON.stringify(selectedQuery.parameters, null, 2)}</pre>
+                </div>
+              )}
+              {selectedQuery.sourceContext && (
+                <div className="query-source-context">
+                  <h4>Source Context</h4>
+                  <CodeMirror
+                    value={selectedQuery.sourceContext}
+                    extensions={[python()]}
+                    editable={false}
+                    basicSetup={{
+                      lineNumbers: false,
+                      foldGutter: false,
+                      dropCursor: false,
+                      allowMultipleSelections: false,
+                      searchKeymap: false,
+                      autocompletion: false,
+                      highlightSelectionMatches: false,
+                    }}
+                    className="source-context-viewer"
+                  />
                 </div>
               )}
               {selectedQuery.result ? (

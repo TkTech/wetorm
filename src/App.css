@@ -299,19 +299,16 @@ body, html, #root, .app {
 
 .query-sql,
 .query-params,
+.query-source-context,
 .query-result,
 .query-error {
   margin-bottom: 1rem;
 }
 
-.sql-viewer {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.sql-viewer .cm-editor {
+.sql-viewer .cm-editor,
+.source-context-viewer .cm-editor {
   font-size: 14px;
+  padding: 1rem;
 }
 
 .query-params pre,
