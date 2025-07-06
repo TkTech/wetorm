@@ -90,7 +90,7 @@ function App() {
 
     try {
       const result = await runDjangoCode(code);
-      setOutput(result || 'Code executed successfully');
+      setOutput(result || '(code executed successfully, but there was no output)');
     } catch (error) {
       setOutput(`Error: ${error}`);
     } finally {

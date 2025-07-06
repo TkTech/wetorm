@@ -84,7 +84,7 @@ export async function initializePyodide(): Promise<PyodideInterface> {
   return pyodide;
 }
 
-export async function runDjangoCode(code: string): Promise<string> {
+export async function runDjangoCode(code: string): Promise<string | null> {
   if (!pyodide) {
     await initializePyodide();
   }
@@ -302,9 +302,5 @@ except Exception as e:
     });
   }
 
-  return queryResult?.output || (result as string);
-}
-
-export function getPyodideInstance(): PyodideInterface | null {
-  return pyodide;
+  return queryResult?.output || null;
 }
