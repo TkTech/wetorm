@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { indentUnit } from '@codemirror/language';
 import { runDjangoCode } from './services/pyodide';
 import { QueryViewer } from './components/QueryViewer';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
@@ -19,11 +20,9 @@ def run():
     instance = Person.objects.create(name='John Doe')
     print(f'Created: {instance}')
     
-    # Show all persons
     for person in Person.objects.all():
         print(f'Person: {person}')
         
-    # Query example
     johns = Person.objects.filter(name__contains='John')
     print(f'Found {johns.count()} people with "John" in their name')
 `;
@@ -98,7 +97,7 @@ function App() {
           <CodeMirror
             value={code}
             onChange={(value) => setCode(value)}
-            extensions={[python(), oneDark]}
+            extensions={[python(), oneDark, indentUnit.of("    ")]}
             theme={oneDark}
             className="code-editor"
             basicSetup={{
