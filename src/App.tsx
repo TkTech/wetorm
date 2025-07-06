@@ -59,8 +59,18 @@ const highlightLineField = StateField.define({
   provide: f => EditorView.decorations.from(f)
 });
 
+const STORAGE_KEY = 'wetorm-editor-content';
+
 function App() {
-  const [code, setCode] = useState(DEFAULT_CODE);
+  const [code, setCode] = useState(() => {
+    // Only load from localStorage if no gist is being loaded
+    const gistId = getGistIdFromUrl();
+    if (!gistId) {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved || DEFAULT_CODE;
+    }
+    return DEFAULT_CODE;
+  });
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [gistError, setGistError] = useState<string | null>(null);
@@ -84,6 +94,14 @@ function App() {
 
     loadGist();
   }, []);
+
+  // Save to localStorage when code changes (but not when loading from gist)
+  useEffect(() => {
+    const gistId = getGistIdFromUrl();
+    if (!gistId && code !== DEFAULT_CODE) {
+      localStorage.setItem(STORAGE_KEY, code);
+    }
+  }, [code]);
 
   const runCode = async () => {
     setIsRunning(true);
