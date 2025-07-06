@@ -308,7 +308,6 @@ body, html, #root, .app {
 .sql-viewer .cm-editor,
 .source-context-viewer .cm-editor {
   font-size: 14px;
-  padding: 1rem;
 }
 
 .query-params pre,
