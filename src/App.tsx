@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
-import CodeMirror from '@uiw/react-codemirror';
-import { python } from '@codemirror/lang-python';
-import { indentUnit } from '@codemirror/language';
+import { useState, useEffect, useCallback } from 'react';
 import { Decoration, EditorView } from '@codemirror/view';
 import { StateField, StateEffect } from '@codemirror/state';
 import { runDjangoCode } from './services/pyodide';
 import { QueryViewer } from './components/QueryViewer';
 import { DatabaseBrowser } from './components/DatabaseBrowser';
 import { PythonRepl } from './components/PythonRepl';
+import { TabbedCodeEditor } from './components/TabbedCodeEditor';
+import { PyodideProvider } from './contexts/PyodideProvider';
+import { usePyodide } from './hooks/usePyodideContext';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
 import './App.css';
 
@@ -60,24 +60,33 @@ const highlightLineField = StateField.define({
   provide: (f) => EditorView.decorations.from(f),
 });
 
-const STORAGE_KEY = 'wetorm-editor-content';
+const STORAGE_KEY_CODE = 'wetorm-editor-content';
 
-function App() {
+function AppContent() {
+  const { bootstrapCode, setBootstrapCode, getPyodideInstance } = usePyodide();
+  
+  const handleCommandExecuted = useCallback(() => {
+    setDbRefreshTrigger((prev) => prev + 1);
+  }, []);
   const [code, setCode] = useState(() => {
     // Only load from localStorage if no gist is being loaded
     const gistId = getGistIdFromUrl();
     if (!gistId) {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved = localStorage.getItem(STORAGE_KEY_CODE);
       return saved || DEFAULT_CODE;
     }
     return DEFAULT_CODE;
   });
+
   const [output, setOutput] = useState('');
   const [isRunning, setIsRunning] = useState(false);
   const [gistError, setGistError] = useState<string | null>(null);
-  const [editorView, setEditorView] = useState<EditorView | null>(null);
+  const [editorViews, setEditorViews] = useState<Map<string, EditorView>>(
+    new Map()
+  );
   const [dbRefreshTrigger, setDbRefreshTrigger] = useState<number>(0);
   const [showRepl, setShowRepl] = useState(false);
+  const [activeTab, setActiveTab] = useState('code.py');
 
   // Load gist content on mount if URL contains gist parameter
   useEffect(() => {
@@ -103,7 +112,7 @@ function App() {
   useEffect(() => {
     const gistId = getGistIdFromUrl();
     if (!gistId && code !== DEFAULT_CODE) {
-      localStorage.setItem(STORAGE_KEY, code);
+      localStorage.setItem(STORAGE_KEY_CODE, code);
     }
   }, [code]);
 
@@ -112,7 +121,10 @@ function App() {
     setOutput('');
 
     try {
-      const result = await runDjangoCode(code);
+      // Get the pyodide instance (will use current bootstrap from context)
+      const pyodideInstance = await getPyodideInstance();
+
+      const result = await runDjangoCode(code, pyodideInstance);
       setOutput(
         result || '(code executed successfully, but there was no output)'
       );
@@ -126,10 +138,39 @@ function App() {
   };
 
   const handleLineHighlight = (lineNumber: number | null) => {
-    if (editorView) {
-      editorView.dispatch({
+    // Highlight line in the currently active editor (code.py for Django queries)
+    const activeEditorView = editorViews.get('code.py');
+    if (activeEditorView) {
+      activeEditorView.dispatch({
         effects: highlightLineEffect.of(lineNumber),
       });
+    }
+  };
+
+  const tabs = [
+    {
+      id: 'code.py',
+      label: 'code.py',
+      content: code,
+      language: 'python',
+    },
+    {
+      id: 'settings.py',
+      label: 'settings.py',
+      content: bootstrapCode,
+      language: 'python',
+    },
+  ];
+
+  const handleTabChange = (tabId: string) => {
+    setActiveTab(tabId);
+  };
+
+  const handleContentChange = (tabId: string, content: string) => {
+    if (tabId === 'code.py') {
+      setCode(content);
+    } else if (tabId === 'settings.py') {
+      setBootstrapCode(content);
     }
   };
 
@@ -168,23 +209,16 @@ function App() {
                 </div>
               </div>
             </div>
-            <CodeMirror
-              value={code}
-              onChange={(value) => setCode(value)}
-              extensions={[python(), indentUnit.of('    '), highlightLineField]}
-              className="code-editor"
-              basicSetup={{
-                lineNumbers: true,
-                foldGutter: true,
-                dropCursor: false,
-                allowMultipleSelections: false,
-                indentOnInput: true,
-                bracketMatching: true,
-                closeBrackets: true,
-                autocompletion: true,
-                highlightSelectionMatches: false,
+            <TabbedCodeEditor
+              tabs={tabs}
+              activeTab={activeTab}
+              onTabChange={handleTabChange}
+              onContentChange={handleContentChange}
+              onCreateEditor={(tabId, view) => {
+                setEditorViews((prev) => new Map(prev).set(tabId, view));
               }}
-              onCreateEditor={(view) => setEditorView(view)}
+              extensions={[highlightLineField]}
+              className="code-editor"
             />
           </div>
           <div className="database-section">
@@ -205,9 +239,7 @@ function App() {
             </div>
             {showRepl ? (
               <PythonRepl
-                onCommandExecuted={() =>
-                  setDbRefreshTrigger((prev) => prev + 1)
-                }
+                onCommandExecuted={handleCommandExecuted}
               />
             ) : (
               <pre className="output">{output}</pre>
@@ -217,6 +249,14 @@ function App() {
         </div>
       </main>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <PyodideProvider>
+      <AppContent />
+    </PyodideProvider>
   );
 }
 

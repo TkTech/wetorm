@@ -1,19 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-  getTables,
-  getTableSchema,
-  getTableData,
-  getTableCount,
-  resetDatabase,
+  useDatabaseOperations,
   type Column,
   type TableRow,
-} from '../services/databaseOperations';
+} from '../hooks/useDatabaseOperations';
 
 interface DatabaseBrowserProps {
   refreshTrigger?: number;
 }
 
 export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
+  const {
+    getTables,
+    getTableSchema,
+    getTableData,
+    getTableCount,
+    resetDatabase,
+  } = useDatabaseOperations();
   const [tables, setTables] = useState<string[]>([]);
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [tableSchema, setTableSchema] = useState<Column[]>([]);
@@ -21,22 +24,8 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
   const [tableCount, setTableCount] = useState<number>(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Only load tables when refresh is triggered (after code has been run)
-  useEffect(() => {
-    if (refreshTrigger > 0) {
-      loadTables();
-    }
-  }, [refreshTrigger]);
 
-  // Refresh selected table data when refresh is triggered
-  useEffect(() => {
-    if (selectedTable && refreshTrigger > 0) {
-      handleTableSelect(selectedTable);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger]); // Intentionally excluding selectedTable and handleTableSelect to avoid infinite loops
-
-  const loadTables = async () => {
+  const loadTables = useCallback(async () => {
     try {
       setError(null);
       const tableNames = await getTables();
@@ -45,7 +34,22 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
       setError('Failed to load tables');
       console.error('Error loading tables:', err);
     }
-  };
+  }, [getTables]);
+
+  // Only load tables when refresh is triggered (after code has been run)
+  useEffect(() => {
+    if (refreshTrigger > 0) {
+      loadTables();
+    }
+  }, [refreshTrigger, loadTables]);
+
+  // Refresh selected table data when refresh is triggered
+  useEffect(() => {
+    if (selectedTable && refreshTrigger > 0) {
+      handleTableSelect(selectedTable);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger]); // Intentionally excluding selectedTable and handleTableSelect to avoid infinite loops
 
   const handleTableSelect = async (tableName: string) => {
     setSelectedTable(tableName);

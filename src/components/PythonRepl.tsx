@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { initializePyodide } from '../services/pyodide';
+import { usePyodide } from '../hooks/usePyodideContext';
 
 declare global {
   interface Window {
@@ -18,13 +18,14 @@ interface PythonReplProps {
 
 export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
   const terminalRef = useRef<HTMLDivElement>(null);
+  const { getPyodideInstance } = usePyodide();
 
   useEffect(() => {
     const initializeRepl = async () => {
       if (!terminalRef.current) return;
 
       try {
-        const pyodide = await initializePyodide();
+        const pyodide = await getPyodideInstance();
 
         // Let's try a simpler approach - just use runPython directly for now
         let outputBuffer = '';
@@ -156,7 +157,7 @@ export function PythonRepl({ onCommandExecuted }: PythonReplProps) {
     };
 
     initializeRepl();
-  }, []);
+  }, [getPyodideInstance, onCommandExecuted]);
 
   return (
     <div className="python-repl">
