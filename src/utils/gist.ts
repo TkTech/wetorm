@@ -55,9 +55,3 @@ export async function fetchGistContent(gistId: string): Promise<string> {
     );
   }
 }
-
-export function createGistUrl(gistId: string): string {
-  const currentUrl = new URL(window.location.href);
-  currentUrl.searchParams.set('gist', gistId);
-  return currentUrl.toString();
-}
