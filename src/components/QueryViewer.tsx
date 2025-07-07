@@ -89,6 +89,11 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
                     {query.queryType}
                   </span>
                 )}
+                {query.tag && (
+                  <span className={`query-tag-badge ${query.tag}`}>
+                    {query.tag}
+                  </span>
+                )}
                 {query.sourceLineNumber && (
                   <span className="source-line-badge">
                     Line {query.sourceLineNumber}

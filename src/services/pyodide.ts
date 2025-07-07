@@ -8,6 +8,7 @@ interface DjangoQuery {
   params?: unknown[];
   line_number?: number;
   source_context?: string;
+  tag?: string;
 }
 
 interface DjangoQueryResult {
@@ -79,6 +80,7 @@ export async function runDjangoCode(
         queryType: queryType,
         sourceLineNumber: query.line_number,
         sourceContext: query.source_context,
+        tag: query.tag,
       });
     });
   }

@@ -10,6 +10,7 @@ export interface QueryInfo {
   queryType?: 'DDL' | 'DML';
   sourceLineNumber?: number;
   sourceContext?: string;
+  tag?: string;
 }
 
 class QueryCapture {

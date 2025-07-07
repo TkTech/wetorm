@@ -341,6 +341,21 @@ html,
   background: #10b981;
 }
 
+.query-tag-badge {
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.8rem;
+}
+
+.query-tag-badge.migration {
+  background: #ef4444;
+}
+
+.query-tag-badge.user {
+  background: #06b6d4;
+}
+
 .source-line-badge {
   background: #8b5cf6;
   color: white;

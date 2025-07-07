@@ -1,11 +1,17 @@
-import sys
 import io
 import time
 import inspect
 import traceback
-from contextlib import redirect_stdout
+from contextlib import redirect_stdout, contextmanager
+
 from django.db import connection
 from django.db.backends.signals import connection_created
+from django.db.migrations.autodetector import MigrationAutodetector
+from django.db.migrations.executor import MigrationExecutor
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.state import ProjectState, ModelState
+from django.db.migrations.questioner import MigrationQuestioner
+from django.apps import apps
 
 # Capture stdout
 captured_output = io.StringIO()
@@ -19,6 +25,7 @@ class LineAwareQueryLogger:
         self.queries = []
         self.original_execute = None
         self.original_executemany = None
+        self.current_tag = None
     
     def patch_cursor(self):
         # Patch the connection's cursor creation to wrap execute methods
@@ -44,7 +51,8 @@ class LineAwareQueryLogger:
                         'time': f"{execution_time:.6f}",
                         'params': params,
                         'line_number': line_info.get('line_number'),
-                        'source_context': line_info.get('source_context')
+                        'source_context': line_info.get('source_context'),
+                        'tag': self.current_tag
                     }
                     self.queries.append(query_info)
                     return result
@@ -55,7 +63,8 @@ class LineAwareQueryLogger:
                         'time': f"{execution_time:.6f}",
                         'params': params,
                         'line_number': line_info.get('line_number'),
-                        'source_context': line_info.get('source_context')
+                        'source_context': line_info.get('source_context'),
+                        'tag': self.current_tag
                     }
                     self.queries.append(query_info)
                     raise
@@ -121,46 +130,56 @@ class LineAwareQueryLogger:
         except Exception:
             pass
         return {}
+    
+    @contextmanager
+    def tag_queries(self, tag):
+        """Context manager to tag queries with a specific label"""
+        old_tag = self.current_tag
+        self.current_tag = tag
+        try:
+            yield
+        finally:
+            self.current_tag = old_tag
 
 # Initialize line-aware query logger
 query_logger = LineAwareQueryLogger()
 
 try:
     with redirect_stdout(captured_output):
+        app_config = apps.get_app_config('wetorm')
+        app_config.models.clear()
+
         # Execute user code in a clean namespace with wetorm app context
         namespace = {'__name__': 'wetorm.models'}
         exec(user_code, namespace)
-        
-        for name, obj in namespace.items():
-            if isinstance(obj, type) and hasattr(obj, '_meta'):
-                if not hasattr(obj._meta, 'app_label') or obj._meta.app_label is None:
-                    obj._meta.app_label = 'wetorm'
-        
+
+        # new_state = ProjectState()
+        models = [
+            obj for name, obj in namespace.items()
+            if isinstance(obj, type) and hasattr(obj, '_meta')
+        ]
+
+        for model in models:
+            if not hasattr(model._meta, 'app_label') or model._meta.app_label is None:
+                model._meta.app_label = 'wetorm'
+            globals()[model.__name__] = model
+
         # Clear existing queries and enable query logging
         connection.queries_log.clear()
-        
         # Patch cursor for line tracking
         query_logger.patch_cursor()
-        
-        from django.db.migrations.autodetector import MigrationAutodetector
-        from django.db.migrations.executor import MigrationExecutor
-        from django.db.migrations.loader import MigrationLoader
-        from django.db.migrations.state import ProjectState, ModelState
-        from django.db.migrations.questioner import MigrationQuestioner
-        from django.apps import apps
-        
-        loader = MigrationLoader(connection)
+
+        loader = MigrationLoader(connection, ignore_no_migrations=True)
         current_state = loader.project_state()
         new_state = ProjectState.from_apps(apps)
-        
+
         detector = MigrationAutodetector(
             current_state,
             new_state,
             questioner=MigrationQuestioner(specified_apps={'wetorm'}),
         )
-        
+
         changes = detector.changes(graph=loader.graph, convert_apps={'wetorm'})
-        
         executor = MigrationExecutor(connection)
         for app_label, migrations_list in changes.items():
             for migration in migrations_list:
@@ -169,31 +188,22 @@ try:
                     migration
                 )
                 
-        # Build target plan
         targets = [
             (app_label, migration.name)
             for app_label, migrations_list in changes.items()
             for migration in migrations_list
         ]
 
-        # Apply migrations
-        executor.migrate(targets)
+        with query_logger.tag_queries('migration'):
+            executor.migrate(targets)
 
         if 'run' in namespace and callable(namespace['run']):
-            namespace['run']()
-        
-        # Copy models and other important definitions to global namespace for REPL access
-        for name, obj in namespace.items():
-            if not name.startswith('__'):  # Skip special variables
-                # Copy models, functions, and other user-defined objects to globals
-                if (hasattr(obj, '__mro__') and 
-                    any(base.__name__ == 'Model' and base.__module__ == 'django.db.models.base' 
-                        for base in obj.__mro__[1:])) or callable(obj):
-                    globals()[name] = obj
-    
+            with query_logger.tag_queries('user'):
+                namespace['run']()
+
     result = captured_output.getvalue()
-except Exception as e:
-    result = f"Error: {str(e)}"
+except Exception:
+    result = f"{captured_output.getvalue()}\n{traceback.format_exc()}"
 
 # Return both output and captured queries with line information
 {
