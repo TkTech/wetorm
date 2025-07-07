@@ -116,6 +116,14 @@ html,
   height: 100vh;
 }
 
+/* Responsive design for small screens */
+@media (max-width: 768px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+}
+
 .code-panel {
   background: white;
   display: flex;
