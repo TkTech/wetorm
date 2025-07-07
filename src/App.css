@@ -154,11 +154,64 @@ html,
   flex-direction: column;
 }
 
+.collapsible-pane {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.collapsible-pane.collapsed {
+  flex: 0 0 auto;
+}
+
+.pane-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  background: #f8f8f8;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.pane-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.collapse-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  font-size: 0.75rem;
+  padding: 0.25rem;
+  border-radius: 2px;
+  transition: background-color 200ms;
+}
+
+.collapse-button:hover {
+  background: #e5e5e5;
+}
+
+.pane-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pane-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .output-section {
   flex: 1;
   display: flex;
   flex-direction: column;
-  border-bottom: 1px solid #ddd;
   background: #fafafa;
 }
 
@@ -235,6 +288,7 @@ html,
   grid-template-columns: 1fr 2fr;
   gap: 1px;
   background: #ddd;
+  border-bottom: 1px solid #ddd;
 }
 
 .query-list {

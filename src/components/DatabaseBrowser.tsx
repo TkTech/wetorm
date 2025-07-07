@@ -4,6 +4,7 @@ import {
   type Column,
   type TableRow,
 } from '../hooks/useDatabaseOperations';
+import { Pane } from './Pane';
 
 interface DatabaseBrowserProps {
   refreshTrigger?: number;
@@ -105,20 +106,22 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
   };
 
   return (
-    <div className="database-browser">
-      <div className="db-header">
-        <h3>Database Browser</h3>
-        <div className="db-header-actions">
+    <Pane
+      title="Database Browser"
+      defaultCollapsed={true}
+      actions={
+        <>
           {error && <div className="error-message">{error}</div>}
           <button
             className="header-button reset-button"
             onClick={handleResetDatabase}
+            disabled={loading}
           >
-            Reset DB
+            {loading ? 'Resetting...' : 'Reset DB'}
           </button>
-        </div>
-      </div>
-
+        </>
+      }
+    >
       <div className="db-content">
         <div className="tables-list">
           <h4>Tables ({tables.length})</h4>
@@ -202,6 +205,6 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
           )}
         </div>
       </div>
-    </div>
+    </Pane>
   );
 }

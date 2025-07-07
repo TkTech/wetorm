@@ -4,6 +4,7 @@ import { sql } from '@codemirror/lang-sql';
 import { python } from '@codemirror/lang-python';
 import { format } from 'sql-formatter';
 import { queryCapture, type QueryInfo } from '../services/queryCapture';
+import { Pane } from './Pane';
 
 interface QueryViewerProps {
   onLineHighlight?: (lineNumber: number | null) => void;
@@ -62,14 +63,15 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
   };
 
   return (
-    <div className="query-viewer">
-      <div className="query-header">
-        <h3>Captured Queries</h3>
+    <Pane
+      title="Captured Queries"
+      defaultCollapsed={false}
+      actions={
         <button className="header-button clear-button" onClick={clearQueries}>
           Clear All
         </button>
-      </div>
-
+      }
+    >
       <div className="query-layout">
         <div className="query-list">
           {queries.map((query) => (
@@ -174,6 +176,6 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
           )}
         </div>
       </div>
-    </div>
+    </Pane>
   );
 };

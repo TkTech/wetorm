@@ -6,6 +6,7 @@ import { QueryViewer } from './components/QueryViewer';
 import { DatabaseBrowser } from './components/DatabaseBrowser';
 import { PythonRepl } from './components/PythonRepl';
 import { TabbedCodeEditor } from './components/TabbedCodeEditor';
+import { Pane } from './components/Pane';
 import { PyodideProvider } from './contexts/PyodideProvider';
 import { usePyodide } from './hooks/usePyodideContext';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
@@ -64,7 +65,7 @@ const STORAGE_KEY_CODE = 'wetorm-editor-content';
 
 function AppContent() {
   const { bootstrapCode, setBootstrapCode, getPyodideInstance } = usePyodide();
-  
+
   const handleCommandExecuted = useCallback(() => {
     setDbRefreshTrigger((prev) => prev + 1);
   }, []);
@@ -221,31 +222,31 @@ function AppContent() {
               className="code-editor"
             />
           </div>
-          <div className="database-section">
-            <DatabaseBrowser refreshTrigger={dbRefreshTrigger} />
-          </div>
         </div>
 
         <div className="results-panel">
-          <div className="output-section">
-            <div className="output-header">
-              <h3>{showRepl ? 'Python REPL' : 'Output'}</h3>
+          <Pane
+            title={showRepl ? 'Python REPL' : 'Output'}
+            defaultCollapsed={false}
+            actions={
               <button
                 className="header-button toggle-button"
                 onClick={() => setShowRepl(!showRepl)}
               >
                 {showRepl ? 'Show Output' : 'Show REPL'}
               </button>
+            }
+          >
+            <div className="output-section">
+              {showRepl ? (
+                <PythonRepl onCommandExecuted={handleCommandExecuted} />
+              ) : (
+                <pre className="output">{output}</pre>
+              )}
             </div>
-            {showRepl ? (
-              <PythonRepl
-                onCommandExecuted={handleCommandExecuted}
-              />
-            ) : (
-              <pre className="output">{output}</pre>
-            )}
-          </div>
+          </Pane>
           <QueryViewer onLineHighlight={handleLineHighlight} />
+          <DatabaseBrowser refreshTrigger={dbRefreshTrigger} />
         </div>
       </main>
     </div>
