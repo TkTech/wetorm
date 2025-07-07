@@ -251,16 +251,10 @@ try:
         namespace = {'__name__': 'wetorm.models'}
         exec(user_code, namespace)
         
-        # Auto-create tables for any models defined
-        models_to_create = []
         for name, obj in namespace.items():
-            if (hasattr(obj, '__mro__') and 
-                any(base.__name__ == 'Model' and base.__module__ == 'django.db.models.base' 
-                    for base in obj.__mro__[1:])):
-                # Auto-set app_label if not explicitly set
+            if isinstance(obj, type) and hasattr(obj, '_meta'):
                 if not hasattr(obj._meta, 'app_label') or obj._meta.app_label is None:
                     obj._meta.app_label = 'wetorm'
-                models_to_create.append(obj)
         
         # Clear existing queries and enable query logging
         connection.queries_log.clear()
@@ -268,17 +262,43 @@ try:
         # Patch cursor for line tracking
         query_logger.patch_cursor()
         
-        # Create tables for the models (this will generate DDL queries that get captured)
-        if models_to_create:
-            with connection.schema_editor() as schema_editor:
-                for model in models_to_create:
-                    try:
-                        schema_editor.create_model(model)
-                    except Exception as e:
-                        # Table might already exist, ignore
-                        pass
+        from django.db.migrations.autodetector import MigrationAutodetector
+        from django.db.migrations.executor import MigrationExecutor
+        from django.db.migrations.loader import MigrationLoader
+        from django.db.migrations.state import ProjectState, ModelState
+        from django.db.migrations.questioner import MigrationQuestioner
+        from django.apps import apps
         
-        # Run the 'run' function if it exists
+        loader = MigrationLoader(connection)
+        current_state = loader.project_state()
+        new_state = ProjectState.from_apps(apps)
+        
+        detector = MigrationAutodetector(
+            current_state,
+            new_state,
+            questioner=MigrationQuestioner(specified_apps={'wetorm'}),
+        )
+        
+        changes = detector.changes(graph=loader.graph, convert_apps={'wetorm'})
+        
+        executor = MigrationExecutor(connection)
+        for app_label, migrations_list in changes.items():
+            for migration in migrations_list:
+                executor.loader.graph.add_node(
+                    (app_label, migration.name),
+                    migration
+                )
+                
+        # Build target plan
+        targets = [
+            (app_label, migration.name)
+            for app_label, migrations_list in changes.items()
+            for migration in migrations_list
+        ]
+
+        # Apply migrations
+        executor.migrate(targets)
+
         if 'run' in namespace and callable(namespace['run']):
             namespace['run']()
         
