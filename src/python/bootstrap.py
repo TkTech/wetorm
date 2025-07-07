@@ -1,3 +1,6 @@
+# This file runs once the first time you hit run, and sets up the
+# Django environment for WetORM. Customize to fit your needs and
+# hit run again to apply changes.
 import os
 import sys
 import types

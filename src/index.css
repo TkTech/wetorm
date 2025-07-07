@@ -1,3 +1,124 @@
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  /* Color System */
+  --primary-brand: #646cff;
+  --primary-brand-hover: #646cff;
+
+  /* Button Colors */
+  --button-success: #22c55e;
+  --button-success-disabled: #888;
+  --button-danger: #ef4444;
+  --button-danger-hover: #dc2626;
+  --button-warning: #f59e0b;
+  --button-warning-hover: #d97706;
+  --button-purple: #8b5cf6;
+  --button-purple-hover: #7c3aed;
+  --button-cyan: #06b6d4;
+
+  /* Badge Colors */
+  --badge-ddl: #f59e0b;
+  --badge-dml: #10b981;
+  --badge-migration: #ef4444;
+  --badge-user: #06b6d4;
+  --badge-source-line: #8b5cf6;
+
+  /* Border Colors */
+  --border-light: #ddd;
+  --border-lighter: #eee;
+  --border-darker: #333;
+
+  /* Background Colors */
+  --bg-white: white;
+  --bg-light: #f8f8f8;
+  --bg-lighter: #fafafa;
+  --bg-tab-bar: #f5f5f5;
+  --bg-selected: #e0f2fe;
+  --bg-warning: #fef3c7;
+  --bg-error: #fee;
+  --bg-gray: #f3f4f6;
+  --bg-dark: #1e1e1e;
+  --bg-dark-secondary: #2d2d2d;
+  --bg-hover: #eee;
+  --bg-hover-secondary: #e5e5e5;
+
+  /* Text Colors */
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-tertiary: #569cd6;
+  --text-quaternary: #374151;
+  --text-light: #d4d4d4;
+  --text-error: #c00;
+  --text-error-secondary: #f14c4c;
+  --text-warning: #d97706;
+
+  /* Highlight Colors */
+  --highlight-yellow: rgba(255, 255, 0, 0.2);
+  --highlight-purple-border: #8b5cf6;
+  --highlight-blue: #0066cc;
+}
+
+/* Dark Theme - Based on CodeMirror One Dark */
+.dark {
+  /* Color System - Dark */
+  --primary-brand: #61afef;
+  --primary-brand-hover: #528bff;
+
+  /* Button Colors - Dark */
+  --button-success: #98c379;
+  --button-success-disabled: #7d8799;
+  --button-danger: #e06c75;
+  --button-danger-hover: #d19a66;
+  --button-warning: #e5c07b;
+  --button-warning-hover: #d19a66;
+  --button-purple: #c678dd;
+  --button-purple-hover: #c678dd;
+  --button-cyan: #56b6c2;
+
+  /* Badge Colors - Dark */
+  --badge-ddl: #e5c07b;
+  --badge-dml: #98c379;
+  --badge-migration: #e06c75;
+  --badge-user: #56b6c2;
+  --badge-source-line: #c678dd;
+
+  /* Border Colors - Dark */
+  --border-light: #3e4451;
+  --border-lighter: #2c313a;
+  --border-darker: #21252b;
+
+  /* Background Colors - Dark */
+  --bg-white: #282c34;
+  --bg-light: #2c313a;
+  --bg-lighter: #21252b;
+  --bg-tab-bar: #21252b;
+  --bg-selected: #3e4451;
+  --bg-warning: #353a42;
+  --bg-error: #2c313a;
+  --bg-gray: #21252b;
+  --bg-dark: #21252b;
+  --bg-dark-secondary: #2c313a;
+  --bg-hover: #3e4451;
+  --bg-hover-secondary: #353a42;
+
+  /* Text Colors - Dark */
+  --text-primary: white;
+  --text-secondary: #abb2bf;
+  --text-tertiary: #61afef;
+  --text-quaternary: white;
+  --text-light: white;
+  --text-error: #e06c75;
+  --text-error-secondary: #e06c75;
+  --text-warning: #e5c07b;
+
+  /* Highlight Colors - Dark */
+  --highlight-yellow: #3e4451;
+  --highlight-purple-border: #c678dd;
+  --highlight-blue: #61afef;
+}
+
 * {
   min-width: 0;
   min-height: 0;
@@ -27,6 +148,9 @@ body {
   line-height: 1.5;
   /* 5. Improve text rendering */
   -webkit-font-smoothing: antialiased;
+  /* Set default text color */
+  color: var(--text-primary);
+  background: var(--bg-white);
 }
 
 /* 6. Improve media defaults */
@@ -77,10 +201,4 @@ h6 {
 #root,
 #__next {
   isolation: isolate;
-}
-
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
 }

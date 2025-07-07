@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import CodeMirror from '@uiw/react-codemirror';
 import { sql } from '@codemirror/lang-sql';
 import { python } from '@codemirror/lang-python';
+import { oneDark } from '@codemirror/theme-one-dark';
 import { format } from 'sql-formatter';
 import { queryCapture, type QueryInfo } from '../services/queryCapture';
+import { useSettings } from '../hooks/useSettings';
 import { Pane } from './Pane';
 
 interface QueryViewerProps {
@@ -15,6 +17,7 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
 }) => {
   const [queries, setQueries] = useState<QueryInfo[]>([]);
   const [selectedQuery, setSelectedQuery] = useState<QueryInfo | null>(null);
+  const { effectiveTheme } = useSettings();
 
   useEffect(() => {
     setQueries(queryCapture.getQueries().reverse());
@@ -137,6 +140,7 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
                     highlightSelectionMatches: false,
                   }}
                   className="sql-viewer"
+                  theme={effectiveTheme === 'dark' ? oneDark : undefined}
                 />
               </div>
               {selectedQuery.parameters && (
@@ -162,6 +166,7 @@ export const QueryViewer: React.FC<QueryViewerProps> = ({
                       highlightSelectionMatches: false,
                     }}
                     className="source-context-viewer"
+                    theme={effectiveTheme === 'dark' ? oneDark : undefined}
                   />
                 </div>
               )}

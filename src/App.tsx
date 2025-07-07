@@ -8,8 +8,11 @@ import { PythonRepl } from './components/PythonRepl';
 import { TabbedCodeEditor } from './components/TabbedCodeEditor';
 import { Pane } from './components/Pane';
 import { PyodideProvider } from './contexts/PyodideProvider';
+import { SettingsProvider } from './contexts/SettingsProvider';
 import { usePyodide } from './hooks/usePyodideContext';
+import { useSettings } from './hooks/useSettings';
 import { getGistIdFromUrl, fetchGistContent } from './utils/gist';
+import { ThemeToggle } from './components/ThemeToggle';
 import './App.css';
 
 const DEFAULT_CODE = `from django.db import models
@@ -65,6 +68,7 @@ const STORAGE_KEY_CODE = 'wetorm-editor-content';
 
 function AppContent() {
   const { bootstrapCode, setBootstrapCode, getPyodideInstance } = usePyodide();
+  const { effectiveTheme } = useSettings();
 
   const handleCommandExecuted = useCallback(() => {
     setDbRefreshTrigger((prev) => prev + 1);
@@ -176,7 +180,7 @@ function AppContent() {
   };
 
   return (
-    <div className="app">
+    <div className={`app ${effectiveTheme === 'dark' ? 'dark' : ''}`}>
       <main className="main-layout">
         <div className="code-panel">
           <div className="code-section">
@@ -192,6 +196,7 @@ function AppContent() {
               <div className="code-header-actions">
                 {gistError && <div className="gist-error">⚠️ {gistError}</div>}
                 <div className="header-actions">
+                  <ThemeToggle />
                   <a
                     href="https://github.com/tktech/wetorm"
                     target="_blank"
@@ -255,9 +260,11 @@ function AppContent() {
 
 function App() {
   return (
-    <PyodideProvider>
-      <AppContent />
-    </PyodideProvider>
+    <SettingsProvider>
+      <PyodideProvider>
+        <AppContent />
+      </PyodideProvider>
+    </SettingsProvider>
   );
 }
 

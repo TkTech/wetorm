@@ -4,7 +4,9 @@ import { indentUnit } from '@codemirror/language';
 import { EditorView, keymap } from '@codemirror/view';
 import type { Extension } from '@codemirror/state';
 import { history, historyKeymap } from '@codemirror/commands';
+import { oneDark } from '@codemirror/theme-one-dark';
 import CodeMirror from '@uiw/react-codemirror';
+import { useSettings } from '../hooks/useSettings';
 import './TabbedCodeEditor.css';
 
 interface Tab {
@@ -40,6 +42,7 @@ const TabEditor: React.FC<TabEditorProps> = ({
   extensions = [],
 }) => {
   const editorRef = useRef<EditorView | null>(null);
+  const { effectiveTheme } = useSettings();
 
   const getLanguageExtension = (language?: string) => {
     switch (language) {
@@ -63,6 +66,7 @@ const TabEditor: React.FC<TabEditorProps> = ({
       },
     }),
     EditorView.lineWrapping,
+    ...(effectiveTheme === 'dark' ? [oneDark] : []),
     ...extensions,
   ];
 
@@ -82,6 +86,7 @@ const TabEditor: React.FC<TabEditorProps> = ({
             onCreateEditor(view);
           }
         }}
+        theme={effectiveTheme === 'dark' ? oneDark : undefined}
       />
     </div>
   );
