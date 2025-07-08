@@ -48,6 +48,8 @@ const TabEditor: React.FC<TabEditorProps> = ({
     switch (language) {
       case 'python':
         return python();
+      case 'text':
+        return [];
       default:
         return python();
     }

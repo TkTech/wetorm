@@ -4,7 +4,7 @@ import type { PyodideInterface } from 'pyodide';
 export interface PyodideContextType {
   bootstrapCode: string;
   setBootstrapCode: (code: string) => void;
-  getPyodideInstance: () => Promise<PyodideInterface>;
+  getPyodideInstance: (requirements?: string) => Promise<PyodideInterface>;
   isInitialized: boolean;
   resetPyodide: () => void;
 }

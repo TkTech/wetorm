@@ -65,6 +65,11 @@ const highlightLineField = StateField.define({
 });
 
 const STORAGE_KEY_CODE = 'wetorm-editor-content';
+const STORAGE_KEY_REQUIREMENTS = 'wetorm-requirements-content';
+const DEFAULT_REQUIREMENTS = [
+  '# Add any PyPi packages your projects needs.',
+  'django==5.2.4',
+].join('\n');
 
 function AppContent() {
   const { bootstrapCode, setBootstrapCode, getPyodideInstance } = usePyodide();
@@ -81,6 +86,15 @@ function AppContent() {
       return saved || DEFAULT_CODE;
     }
     return DEFAULT_CODE;
+  });
+
+  const [requirements, setRequirements] = useState(() => {
+    const gistId = getGistIdFromUrl();
+    if (!gistId) {
+      const saved = localStorage.getItem(STORAGE_KEY_REQUIREMENTS);
+      return saved || DEFAULT_REQUIREMENTS;
+    }
+    return DEFAULT_REQUIREMENTS;
   });
 
   const [output, setOutput] = useState('');
@@ -100,8 +114,27 @@ function AppContent() {
       if (gistId) {
         try {
           setGistError(null);
-          const gistContent = await fetchGistContent(gistId);
-          setCode(gistContent);
+          const gistContents = await fetchGistContent(gistId);
+
+          // Load code.py or first file that isn't settings.py or requirements.txt
+          const codeFile =
+            gistContents['code.py'] ||
+            Object.entries(gistContents).find(
+              ([name]) => name !== 'settings.py' && name !== 'requirements.txt'
+            )?.[1];
+          if (codeFile) {
+            setCode(codeFile);
+          }
+
+          // Load settings.py if available
+          if (gistContents['settings.py']) {
+            setBootstrapCode(gistContents['settings.py']);
+          }
+
+          // Load requirements.txt if available
+          if (gistContents['requirements.txt']) {
+            setRequirements(gistContents['requirements.txt']);
+          }
         } catch (error) {
           setGistError(
             error instanceof Error ? error.message : 'Failed to load gist'
@@ -111,7 +144,7 @@ function AppContent() {
     };
 
     loadGist();
-  }, []);
+  }, [setBootstrapCode]);
 
   // Save to localStorage when code changes (but not when loading from gist)
   useEffect(() => {
@@ -121,21 +154,33 @@ function AppContent() {
     }
   }, [code]);
 
+  // Save to localStorage when requirements change (but not when loading from gist)
+  useEffect(() => {
+    const gistId = getGistIdFromUrl();
+    if (!gistId && requirements !== DEFAULT_REQUIREMENTS) {
+      localStorage.setItem(STORAGE_KEY_REQUIREMENTS, requirements);
+    }
+  }, [requirements]);
+
   const runCode = async () => {
     setIsRunning(true);
     setOutput('');
 
     try {
-      // Get the pyodide instance (will use current bootstrap from context)
-      const pyodideInstance = await getPyodideInstance();
+      // Get the pyodide instance with requirements (packages will be installed during initialization)
+      setOutput('Initializing environment...');
+      const pyodideInstance = await getPyodideInstance(requirements);
 
+      setOutput('Running code...');
       const result = await runDjangoCode(code, pyodideInstance);
       setOutput(
         result || '(code executed successfully, but there was no output)'
       );
+
       // Trigger database refresh after successful code execution
       setDbRefreshTrigger((prev) => prev + 1);
     } catch (error) {
+      console.error('Error running code:', error);
       setOutput(`Error: ${error}`);
     } finally {
       setIsRunning(false);
@@ -165,6 +210,12 @@ function AppContent() {
       content: bootstrapCode,
       language: 'python',
     },
+    {
+      id: 'requirements.txt',
+      label: 'requirements.txt',
+      content: requirements,
+      language: 'text',
+    },
   ];
 
   const handleTabChange = (tabId: string) => {
@@ -176,6 +227,8 @@ function AppContent() {
       setCode(content);
     } else if (tabId === 'settings.py') {
       setBootstrapCode(content);
+    } else if (tabId === 'requirements.txt') {
+      setRequirements(content);
     }
   };
 

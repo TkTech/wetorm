@@ -9,6 +9,8 @@ interface GistResponse {
   description: string;
 }
 
+export type GistContents = Record<string, string>;
+
 export function getGistIdFromUrl(): string | null {
   const urlParams = new URLSearchParams(window.location.search);
   const gistParam = urlParams.get('gist');
@@ -24,7 +26,7 @@ export function getGistIdFromUrl(): string | null {
   return gistIdMatch ? gistIdMatch[1] : null;
 }
 
-export async function fetchGistContent(gistId: string): Promise<string> {
+export async function fetchGistContent(gistId: string): Promise<GistContents> {
   try {
     const response = await fetch(`https://api.github.com/gists/${gistId}`);
 
@@ -34,20 +36,14 @@ export async function fetchGistContent(gistId: string): Promise<string> {
 
     const gistData: GistResponse = await response.json();
 
-    // Get the first file's content (or look for a Python file)
-    const files = Object.values(gistData.files);
-    const pythonFile = files.find(
-      (file) =>
-        file.filename.endsWith('.py') || file.filename.endsWith('.python')
-    );
+    const result: GistContents = {};
 
-    const targetFile = pythonFile || files[0];
+    // Convert all files to filename -> content mapping
+    Object.values(gistData.files).forEach((file) => {
+      result[file.filename] = file.content;
+    });
 
-    if (!targetFile) {
-      throw new Error('No files found in gist');
-    }
-
-    return targetFile.content;
+    return result;
   } catch (error) {
     console.error('Error fetching gist:', error);
     throw new Error(

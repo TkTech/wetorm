@@ -17,17 +17,22 @@ interface DjangoQueryResult {
 }
 
 export async function initializePyodide(
-  bootstrapCode?: string
+  bootstrapCode?: string,
+  requirements?: string
 ): Promise<PyodideInterface> {
   const pyodide = await loadPyodide({
     indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.28.0/full/',
   });
 
   await pyodide.loadPackage(['micropip', 'sqlite3']);
-  await pyodide.runPythonAsync(`
-    import micropip
-    await micropip.install('django')
-  `);
+
+  // Import micropip for use
+  await pyodide.runPythonAsync('import micropip');
+
+  // Install requirements if provided
+  if (requirements) {
+    await installRequirementsInPyodide(requirements, pyodide);
+  }
 
   // Use custom bootstrap code if provided, otherwise use default
   pyodide.runPython(bootstrapCode || defaultBootstrapCode);
@@ -37,6 +42,61 @@ export async function initializePyodide(
 
 export function getDefaultBootstrap(): string {
   return defaultBootstrapCode;
+}
+
+// Internal function for installing requirements during initialization (no detailed output)
+async function installRequirementsInPyodide(
+  requirements: string,
+  pyodideInstance: PyodideInterface
+): Promise<void> {
+  if (!requirements.trim()) {
+    return;
+  }
+
+  const lines = requirements
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'));
+
+  for (const line of lines) {
+    await pyodideInstance.runPythonAsync(`await micropip.install('${line}')`);
+  }
+}
+
+export async function installRequirements(
+  requirements: string,
+  pyodideInstance: PyodideInterface
+): Promise<string> {
+  if (!requirements.trim()) {
+    return 'No requirements to install.';
+  }
+
+  const lines = requirements
+    .split('\n')
+    .map((line) => line.trim())
+    .filter((line) => line && !line.startsWith('#'));
+
+  if (lines.length === 0) {
+    return 'No valid requirements found.';
+  }
+
+  let output = 'Installing packages:\n';
+  const results: string[] = [];
+
+  for (const line of lines) {
+    try {
+      output += `Installing ${line}...\n`;
+      await pyodideInstance.runPythonAsync(`await micropip.install('${line}')`);
+      results.push(`✓ ${line}`);
+    } catch (error) {
+      const errorMsg = `✗ ${line}: ${error}`;
+      results.push(errorMsg);
+      output += `Error: ${errorMsg}\n`;
+    }
+  }
+
+  output += '\nInstallation summary:\n' + results.join('\n');
+  return output;
 }
 
 export async function runDjangoCode(

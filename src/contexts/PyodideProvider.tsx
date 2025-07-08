@@ -16,6 +16,7 @@ export function PyodideProvider({ children }: PyodideProviderProps) {
   const [pyodideInstance, setPyodideInstance] =
     useState<PyodideInterface | null>(null);
   const [lastBootstrapCode, setLastBootstrapCode] = useState<string>('');
+  const [lastRequirements, setLastRequirements] = useState<string>('');
 
   const setBootstrapCode = useCallback((code: string) => {
     setBootstrapCodeState(code);
@@ -25,23 +26,38 @@ export function PyodideProvider({ children }: PyodideProviderProps) {
     setLastBootstrapCode('');
   }, []);
 
-  const getPyodideInstance =
-    useCallback(async (): Promise<PyodideInterface> => {
-      // If we have a cached instance and bootstrap hasn't changed, return it
-      if (pyodideInstance && lastBootstrapCode === bootstrapCode) {
+  const getPyodideInstance = useCallback(
+    async (requirements?: string): Promise<PyodideInterface> => {
+      // Use provided requirements, or fall back to last used requirements, or empty string
+      const currentRequirements =
+        requirements !== undefined ? requirements : lastRequirements || '';
+
+      // If we have a cached instance and nothing has changed, return it
+      if (
+        pyodideInstance &&
+        lastBootstrapCode === bootstrapCode &&
+        lastRequirements === currentRequirements
+      ) {
         return pyodideInstance;
       }
 
-      // Create new instance with current bootstrap
-      const instance = await initializePyodide(bootstrapCode);
+      // Create new instance with current bootstrap and requirements
+      const instance = await initializePyodide(
+        bootstrapCode,
+        currentRequirements
+      );
       setPyodideInstance(instance);
       setLastBootstrapCode(bootstrapCode);
+      setLastRequirements(currentRequirements);
       return instance;
-    }, [pyodideInstance, lastBootstrapCode, bootstrapCode]);
+    },
+    [pyodideInstance, lastBootstrapCode, bootstrapCode, lastRequirements]
+  );
 
   const resetPyodide = useCallback(() => {
     setPyodideInstance(null);
     setLastBootstrapCode('');
+    setLastRequirements('');
   }, []);
 
   const value: PyodideContextType = {
