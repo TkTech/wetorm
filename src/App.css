@@ -349,6 +349,7 @@ html,
 
 .query-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   margin-bottom: 0.5rem;
   gap: 8px;
