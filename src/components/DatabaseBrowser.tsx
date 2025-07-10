@@ -148,21 +148,27 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
             <>
               <div className="schema-section">
                 <h4>Schema: {selectedTable}</h4>
-                <div className="schema-table">
-                  <div className="schema-header">
-                    <span>Column</span>
-                    <span>Type</span>
-                    <span>Nullable</span>
-                    <span>Primary Key</span>
-                  </div>
-                  {tableSchema.map((column) => (
-                    <div key={column.name} className="schema-row">
-                      <span>{column.name}</span>
-                      <span>{column.type}</span>
-                      <span>{column.nullable ? 'YES' : 'NO'}</span>
-                      <span>{column.primaryKey ? 'YES' : 'NO'}</span>
-                    </div>
-                  ))}
+                <div className="table-container">
+                  <table className="schema-table">
+                    <thead>
+                      <tr>
+                        <th>Column</th>
+                        <th>Type</th>
+                        <th>Nullable</th>
+                        <th>Primary Key</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tableSchema.map((column) => (
+                        <tr key={column.name}>
+                          <td>{column.name}</td>
+                          <td>{column.type}</td>
+                          <td>{column.nullable ? 'YES' : 'NO'}</td>
+                          <td>{column.primaryKey ? 'YES' : 'NO'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </div>
 
@@ -173,24 +179,28 @@ export function DatabaseBrowser({ refreshTrigger = 0 }: DatabaseBrowserProps) {
                 {loading ? (
                   <div className="loading">Loading...</div>
                 ) : (
-                  <div className="data-table">
+                  <div className="table-container">
                     {tableData.length > 0 ? (
-                      <>
-                        <div className="data-header">
-                          {Object.keys(tableData[0]).map((key) => (
-                            <span key={key}>{key}</span>
-                          ))}
-                        </div>
-                        {tableData.map((row, index) => (
-                          <div key={index} className="data-row">
-                            {Object.values(row).map((value, cellIndex) => (
-                              <span key={cellIndex}>
-                                {value === null ? 'NULL' : String(value)}
-                              </span>
+                      <table className="data-table">
+                        <thead>
+                          <tr>
+                            {Object.keys(tableData[0]).map((key) => (
+                              <th key={key}>{key}</th>
                             ))}
-                          </div>
-                        ))}
-                      </>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {tableData.map((row, index) => (
+                            <tr key={index}>
+                              {Object.values(row).map((value, cellIndex) => (
+                                <td key={cellIndex}>
+                                  {value === null ? 'NULL' : String(value)}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     ) : (
                       <div className="empty-data">No data available</div>
                     )}
